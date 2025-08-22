@@ -1,14 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/Table';
 import { Button } from '../../components/ui/Button';
 import { DebouncedSearchInput } from '../../components/ui/DebouncedSearchInput';
 import { FilterSelect } from '../../components/ui/FilterSelect';
 import { Pagination } from '../../components/ui/Pagination';
 import { useRepuestosServerSearch } from '../../hooks/useRepuestosServerSearch';
+import { repuestosApi } from '../../api';
 import { Plus, Edit, Trash2, Eye, Filter, X, Server, Monitor } from 'lucide-react';
 
 const RepuestosListOptimized: React.FC = () => {
+  const queryClient = useQueryClient();
+  
   const {
     repuestos,
     filters,
@@ -28,6 +32,19 @@ const RepuestosListOptimized: React.FC = () => {
     uniqueUbicaciones,
     isUsingServerSearch,
   } = useRepuestosServerSearch();
+
+  const deleteMutation = useMutation({
+    mutationFn: repuestosApi.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['repuestos'] });
+    },
+  });
+
+  const handleDelete = (id: number, nombre: string) => {
+    if (window.confirm(`¿Estás seguro de que quieres eliminar el repuesto "${nombre}"?`)) {
+      deleteMutation.mutate(id);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -121,7 +138,7 @@ const RepuestosListOptimized: React.FC = () => {
               />
               
               <FilterSelect
-                label="Ubicación"
+                label="Almacenamiento"
                 value={filters.ubicacion}
                 onChange={(e) => updateFilter('ubicacion', e.target.value)}
                 options={ubicacionOptions}
@@ -177,7 +194,7 @@ const RepuestosListOptimized: React.FC = () => {
                 <TableHead>Código</TableHead>
                 <TableHead>Nombre</TableHead>
                 <TableHead>Cantidad</TableHead>
-                <TableHead>Ubicación</TableHead>
+                <TableHead>Almacenamiento</TableHead>
                 <TableHead>Proveedor</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
@@ -208,7 +225,12 @@ const RepuestosListOptimized: React.FC = () => {
                         {repuesto.cantidad}
                       </span>
                     </TableCell>
-                    <TableCell>{repuesto.ubicacion || '-'}</TableCell>
+                    <TableCell>
+                      {repuesto.almacenamiento 
+                        ? `${repuesto.almacenamiento.codigo} - ${repuesto.almacenamiento.nombre}`
+                        : repuesto.ubicacion || '-'
+                      }
+                    </TableCell>
                     <TableCell>{repuesto.proveedor?.nombre || '-'}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end space-x-2">
@@ -222,7 +244,12 @@ const RepuestosListOptimized: React.FC = () => {
                             <Edit className="w-4 h-4" />
                           </Button>
                         </Link>
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleDelete(repuesto.id, repuesto.nombre)}
+                          disabled={deleteMutation.isPending}
+                        >
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>

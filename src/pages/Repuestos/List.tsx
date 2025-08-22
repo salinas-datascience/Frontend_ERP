@@ -1,14 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/Table';
 import { Button } from '../../components/ui/Button';
 import { SearchInput } from '../../components/ui/SearchInput';
 import { FilterSelect } from '../../components/ui/FilterSelect';
 import { Pagination } from '../../components/ui/Pagination';
 import { useRepuestosSearch } from '../../hooks/useRepuestosSearch';
+import { repuestosApi } from '../../api';
 import { Plus, Edit, Trash2, Eye, Filter, X } from 'lucide-react';
 
 const RepuestosList: React.FC = () => {
+  const queryClient = useQueryClient();
+  
   const {
     repuestos,
     filters,
@@ -27,6 +31,19 @@ const RepuestosList: React.FC = () => {
     uniqueProveedores,
     uniqueUbicaciones,
   } = useRepuestosSearch();
+
+  const deleteMutation = useMutation({
+    mutationFn: repuestosApi.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['repuestos'] });
+    },
+  });
+
+  const handleDelete = (id: number, nombre: string) => {
+    if (window.confirm(`¿Estás seguro de que quieres eliminar el repuesto "${nombre}"?`)) {
+      deleteMutation.mutate(id);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -195,7 +212,12 @@ const RepuestosList: React.FC = () => {
                             <Edit className="w-4 h-4" />
                           </Button>
                         </Link>
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleDelete(repuesto.id, repuesto.nombre)}
+                          disabled={deleteMutation.isPending}
+                        >
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>

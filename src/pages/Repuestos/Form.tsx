@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { repuestosApi, proveedoresApi } from '../../api';
+import { repuestosApi, proveedoresApi, almacenamientosApi } from '../../api';
 import type { RepuestoCreate, RepuestoUpdate } from '../../types';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { ArrowLeft, Save } from 'lucide-react';
+import { AlmacenamientoCRUD } from '../../components/AlmacenamientoCRUD';
+import { ArrowLeft, Save, Settings } from 'lucide-react';
 
 const RepuestosForm: React.FC = () => {
   const { id } = useParams();
@@ -18,9 +19,12 @@ const RepuestosForm: React.FC = () => {
     nombre: '',
     detalle: '',
     ubicacion: '',
+    almacenamiento_id: undefined,
     cantidad: 0,
     proveedor_id: undefined,
   });
+
+  const [showAlmacenamientoModal, setShowAlmacenamientoModal] = useState(false);
 
   const { data: repuesto, isLoading: isLoadingRepuesto } = useQuery({
     queryKey: ['repuesto', id],
@@ -33,6 +37,11 @@ const RepuestosForm: React.FC = () => {
     queryFn: proveedoresApi.getAll,
   });
 
+  const { data: almacenamientos } = useQuery({
+    queryKey: ['almacenamientos'],
+    queryFn: almacenamientosApi.getAll,
+  });
+
   useEffect(() => {
     if (repuesto && isEditing) {
       setFormData({
@@ -40,6 +49,7 @@ const RepuestosForm: React.FC = () => {
         nombre: repuesto.nombre,
         detalle: repuesto.detalle || '',
         ubicacion: repuesto.ubicacion || '',
+        almacenamiento_id: repuesto.almacenamiento_id,
         cantidad: repuesto.cantidad,
         proveedor_id: repuesto.proveedor_id,
       });
@@ -78,10 +88,19 @@ const RepuestosForm: React.FC = () => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'cantidad' || name === 'proveedor_id' 
+      [name]: name === 'cantidad' || name === 'proveedor_id' || name === 'almacenamiento_id'
         ? value === '' ? undefined : Number(value)
         : value
     }));
+  };
+
+  const handleAlmacenamientoSelect = (almacenamiento: any) => {
+    setFormData(prev => ({
+      ...prev,
+      almacenamiento_id: almacenamiento.id
+    }));
+    // Refrescar la lista de almacenamientos
+    queryClient.invalidateQueries({ queryKey: ['almacenamientos'] });
   };
 
   if (isEditing && isLoadingRepuesto) {
@@ -149,14 +168,31 @@ const RepuestosForm: React.FC = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Ubicación
+                Almacenamiento
               </label>
-              <Input
-                name="ubicacion"
-                value={formData.ubicacion}
-                onChange={handleChange}
-                placeholder="Ej: Estante A-1"
-              />
+              <div className="flex gap-2">
+                <select
+                  name="almacenamiento_id"
+                  value={formData.almacenamiento_id || ''}
+                  onChange={handleChange}
+                  className="flex h-10 w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Seleccionar almacenamiento</option>
+                  {almacenamientos?.map((almacenamiento) => (
+                    <option key={almacenamiento.id} value={almacenamiento.id}>
+                      {almacenamiento.codigo} - {almacenamiento.nombre}
+                    </option>
+                  ))}
+                </select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowAlmacenamientoModal(true)}
+                  className="whitespace-nowrap"
+                >
+                  <Settings className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
 
             <div className="md:col-span-2">
@@ -212,6 +248,13 @@ const RepuestosForm: React.FC = () => {
           </div>
         </form>
       </div>
+
+      {/* Modal de gestión de almacenamiento */}
+      <AlmacenamientoCRUD
+        isOpen={showAlmacenamientoModal}
+        onClose={() => setShowAlmacenamientoModal(false)}
+        onSelect={handleAlmacenamientoSelect}
+      />
     </div>
   );
 };

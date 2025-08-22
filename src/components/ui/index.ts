@@ -5,3 +5,4 @@ export * from './SearchInput';
 export * from './DebouncedSearchInput';
 export * from './FilterSelect';
 export * from './Pagination';
+export * from './Modal';
