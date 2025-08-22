@@ -13,7 +13,7 @@ interface LoginResponse {
   expires_in: number;
 }
 
-interface ChangePasswordRequest {
+export interface ChangePasswordRequest {
   password_actual: string;
   password_nueva: string;
   confirmar_password: string;

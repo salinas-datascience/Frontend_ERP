@@ -15,12 +15,22 @@ import HistorialPage from './pages/Historial'
 // Importar páginas de administración
 import { AdminDashboard, UsuariosList, UsuarioForm, UserPageAssignment } from './pages/Admin'
 
+// Importar páginas de autenticación
+import { ChangePassword } from './pages/Auth'
+
 function App() {
   return (
     <AuthProvider>
       <Routes>
         {/* Ruta de login */}
         <Route path="/login" element={<Login />} />
+        
+        {/* Ruta de cambio de contraseña */}
+        <Route path="/change-password" element={
+          <RequireAuth>
+            <ChangePassword />
+          </RequireAuth>
+        } />
         
         {/* Rutas protegidas */}
         <Route path="/" element={

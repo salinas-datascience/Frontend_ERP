@@ -29,6 +29,11 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Si el usuario debe cambiar contraseña y no está en la página de cambio
+  if (authState.user?.debe_cambiar_password && location.pathname !== '/change-password') {
+    return <Navigate to="/change-password" replace />;
+  }
+
   // Si requiere admin y el usuario no es admin
   if (requireAdmin && !authState.user?.es_admin) {
     return (

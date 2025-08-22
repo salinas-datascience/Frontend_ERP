@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ChevronDown, User, LogOut, Settings, Key } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -45,31 +46,35 @@ const Navbar: React.FC = () => {
 
           {/* Menú desplegable */}
           {userMenuOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-              <div className="px-4 py-2 text-sm text-gray-700 border-b">
+            <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-700">
+              <div className="px-4 py-2 text-sm text-gray-100 border-b border-gray-700">
                 <div className="font-medium">{authState.user.username}</div>
-                <div className="text-xs text-gray-500">{authState.user.email}</div>
+                <div className="text-xs text-gray-400">{authState.user.email}</div>
               </div>
               
               {authState.user.debe_cambiar_password && (
-                <div className="px-4 py-2 text-xs text-yellow-600 bg-yellow-50 border-b">
+                <div className="px-4 py-2 text-xs text-yellow-400 bg-yellow-900 border-b border-gray-700">
                   ⚠️ Debes cambiar tu contraseña
                 </div>
               )}
 
-              <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              <button className="flex items-center w-full px-4 py-2 text-sm text-gray-100 hover:bg-gray-700">
                 <Settings className="w-4 h-4 mr-2" />
                 Configuración
               </button>
 
-              <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              <Link 
+                to="/change-password"
+                onClick={() => setUserMenuOpen(false)}
+                className="flex items-center w-full px-4 py-2 text-sm text-gray-100 hover:bg-gray-700"
+              >
                 <Key className="w-4 h-4 mr-2" />
                 Cambiar Contraseña
-              </button>
+              </Link>
 
               <button
                 onClick={handleLogout}
-                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-t"
+                className="flex items-center w-full px-4 py-2 text-sm text-gray-100 hover:bg-gray-700 border-t border-gray-700"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Cerrar Sesión
