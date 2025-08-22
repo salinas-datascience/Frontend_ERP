@@ -71,16 +71,25 @@ const RepuestosDetail: React.FC = () => {
             <div className="flex items-center space-x-3">
               <div className="w-5 h-5 flex items-center justify-center">
                 <span className={`w-3 h-3 rounded-full ${
-                  repuesto.cantidad > 10 
-                    ? 'bg-green-400' 
-                    : repuesto.cantidad > 0 
-                      ? 'bg-yellow-400'
-                      : 'bg-red-400'
+                  repuesto.cantidad_minima 
+                    ? repuesto.cantidad > repuesto.cantidad_minima
+                      ? 'bg-green-400' 
+                      : repuesto.cantidad > 0 
+                        ? 'bg-yellow-400'
+                        : 'bg-red-400'
+                    : repuesto.cantidad > 10 
+                      ? 'bg-green-400' 
+                      : repuesto.cantidad > 0 
+                        ? 'bg-yellow-400'
+                        : 'bg-red-400'
                 }`} />
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-400">Cantidad</label>
                 <p className="text-lg text-white">{repuesto.cantidad} unidades</p>
+                {repuesto.cantidad_minima && (
+                  <p className="text-xs text-gray-400">Mínimo: {repuesto.cantidad_minima}</p>
+                )}
               </div>
             </div>
           </div>
@@ -90,7 +99,19 @@ const RepuestosDetail: React.FC = () => {
               <MapPin className="w-5 h-5 text-blue-400" />
               <div>
                 <label className="text-sm font-medium text-gray-400">Ubicación</label>
-                <p className="text-lg text-white">{repuesto.ubicacion || 'No especificada'}</p>
+                {repuesto.almacenamiento ? (
+                  <div className="space-y-1">
+                    <p className="text-lg text-white">{repuesto.almacenamiento.nombre}</p>
+                    {repuesto.almacenamiento.ubicacion_fisica && (
+                      <p className="text-sm text-gray-300">{repuesto.almacenamiento.ubicacion_fisica}</p>
+                    )}
+                    <p className="text-xs text-gray-400">Código: {repuesto.almacenamiento.codigo}</p>
+                  </div>
+                ) : repuesto.ubicacion ? (
+                  <p className="text-lg text-white">{repuesto.ubicacion}</p>
+                ) : (
+                  <p className="text-lg text-gray-400">No especificada</p>
+                )}
               </div>
             </div>
 

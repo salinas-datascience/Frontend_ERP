@@ -216,11 +216,17 @@ const RepuestosListOptimized: React.FC = () => {
                     <TableCell className="font-medium">{repuesto.nombre}</TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 rounded-full text-xs ${
-                        repuesto.cantidad > 10 
-                          ? 'bg-green-900 text-green-300' 
-                          : repuesto.cantidad > 0 
-                            ? 'bg-yellow-900 text-yellow-300'
-                            : 'bg-red-900 text-red-300'
+                        repuesto.cantidad_minima 
+                          ? repuesto.cantidad > repuesto.cantidad_minima
+                            ? 'bg-green-900 text-green-300' 
+                            : repuesto.cantidad > 0 
+                              ? 'bg-yellow-900 text-yellow-300'
+                              : 'bg-red-900 text-red-300'
+                          : repuesto.cantidad > 10 
+                            ? 'bg-green-900 text-green-300' 
+                            : repuesto.cantidad > 0 
+                              ? 'bg-yellow-900 text-yellow-300'
+                              : 'bg-red-900 text-red-300'
                       }`}>
                         {repuesto.cantidad}
                       </span>

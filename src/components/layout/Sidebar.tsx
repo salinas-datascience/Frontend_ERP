@@ -6,6 +6,7 @@ import {
   Users, 
   Monitor, 
   History,
+  Settings,
 } from 'lucide-react';
 
 const navigationItems = [
@@ -23,6 +24,11 @@ const navigationItems = [
     name: 'Máquinas',
     href: '/maquinas',
     icon: Monitor,
+  },
+  {
+    name: 'Modelos de Máquinas',
+    href: '/modelos-maquinas',
+    icon: Settings,
   },
   {
     name: 'Historial',

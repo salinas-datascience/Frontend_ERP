@@ -9,6 +9,7 @@ export interface Repuesto {
   ubicacion?: string; // Campo legacy para compatibilidad
   almacenamiento_id?: number;
   cantidad: number;
+  cantidad_minima?: number; // Cantidad mínima personalizada para alertas
   proveedor_id?: number;
   proveedor?: Proveedor;
   almacenamiento?: Almacenamiento;
@@ -23,5 +24,6 @@ export interface RepuestoUpdate {
   ubicacion?: string;
   almacenamiento_id?: number;
   cantidad?: number;
+  cantidad_minima?: number;
   proveedor_id?: number;
 }

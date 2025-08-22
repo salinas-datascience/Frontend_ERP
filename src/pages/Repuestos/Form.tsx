@@ -21,6 +21,7 @@ const RepuestosForm: React.FC = () => {
     ubicacion: '',
     almacenamiento_id: undefined,
     cantidad: 0,
+    cantidad_minima: undefined,
     proveedor_id: undefined,
   });
 
@@ -51,6 +52,7 @@ const RepuestosForm: React.FC = () => {
         ubicacion: repuesto.ubicacion || '',
         almacenamiento_id: repuesto.almacenamiento_id,
         cantidad: repuesto.cantidad,
+        cantidad_minima: repuesto.cantidad_minima,
         proveedor_id: repuesto.proveedor_id,
       });
     }
@@ -88,7 +90,7 @@ const RepuestosForm: React.FC = () => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'cantidad' || name === 'proveedor_id' || name === 'almacenamiento_id'
+      [name]: name === 'cantidad' || name === 'cantidad_minima' || name === 'proveedor_id' || name === 'almacenamiento_id'
         ? value === '' ? undefined : Number(value)
         : value
     }));
@@ -164,6 +166,23 @@ const RepuestosForm: React.FC = () => {
                 onChange={handleChange}
                 required
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Cantidad Mínima
+              </label>
+              <Input
+                name="cantidad_minima"
+                type="number"
+                min="0"
+                value={formData.cantidad_minima || ''}
+                onChange={handleChange}
+                placeholder="Ej: 5 (opcional)"
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                Alerta cuando el stock esté por debajo de esta cantidad
+              </p>
             </div>
 
             <div>

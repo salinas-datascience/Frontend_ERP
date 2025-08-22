@@ -25,29 +25,87 @@ export const repuestosApi = {
   },
 
   search: async (params: RepuestosSearchParams): Promise<RepuestosSearchResponse> => {
+    // Usar el endpoint básico de repuestos ya que el backend no tiene /search
     const searchParams = new URLSearchParams();
     
-    if (params.search) searchParams.append('search', params.search);
+    if (params.limit) searchParams.append('limit', params.limit.toString());
+    if (params.page) {
+      const skip = ((params.page - 1) * (params.limit || 20));
+      searchParams.append('skip', skip.toString());
+    }
+
+    const response = await apiClient.get(`/repuestos/?${searchParams.toString()}`);
+    const items = response.data;
+    
+    // Simular paginación y filtros en el frontend hasta que se implemente en el backend
+    let filteredItems = items;
+    
+    // Filtrar por búsqueda
+    if (params.search) {
+      const searchLower = params.search.toLowerCase();
+      filteredItems = filteredItems.filter((item: any) => 
+        item.codigo?.toLowerCase().includes(searchLower) ||
+        item.nombre?.toLowerCase().includes(searchLower) ||
+        item.detalle?.toLowerCase().includes(searchLower) ||
+        item.ubicacion?.toLowerCase().includes(searchLower) ||
+        item.proveedor?.nombre?.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    // Filtrar por proveedor
     if (params.proveedor_id && params.proveedor_id !== 'all') {
       if (params.proveedor_id === 'none') {
-        searchParams.append('no_proveedor', 'true');
+        filteredItems = filteredItems.filter((item: any) => !item.proveedor_id);
       } else {
-        searchParams.append('proveedor_id', params.proveedor_id.toString());
+        filteredItems = filteredItems.filter((item: any) => 
+          item.proveedor_id?.toString() === params.proveedor_id?.toString()
+        );
       }
     }
+    
+    // Filtrar por ubicación
     if (params.ubicacion && params.ubicacion !== 'all') {
       if (params.ubicacion === 'none') {
-        searchParams.append('no_ubicacion', 'true');
+        filteredItems = filteredItems.filter((item: any) => !item.ubicacion);
       } else {
-        searchParams.append('ubicacion', params.ubicacion);
+        filteredItems = filteredItems.filter((item: any) => item.ubicacion === params.ubicacion);
       }
     }
-    if (params.stock_status) searchParams.append('stock_status', params.stock_status);
-    if (params.page) searchParams.append('page', params.page.toString());
-    if (params.limit) searchParams.append('limit', params.limit.toString());
+    
+    // Filtrar por stock
+    if (params.stock_status) {
+      filteredItems = filteredItems.filter((item: any) => {
+        const cantidad = item.cantidad || 0;
+        const minima = item.cantidad_minima || 10;
+        
+        switch (params.stock_status) {
+          case 'available':
+            return cantidad > minima;
+          case 'low':
+            return cantidad > 0 && cantidad <= minima;
+          case 'empty':
+            return cantidad === 0;
+          default:
+            return true;
+        }
+      });
+    }
 
-    const response = await apiClient.get(`/repuestos/search?${searchParams.toString()}`);
-    return response.data;
+    // Simular paginación
+    const page = params.page || 1;
+    const limit = params.limit || 20;
+    const total = filteredItems.length;
+    const pages = Math.ceil(total / limit);
+    const start = (page - 1) * limit;
+    const paginatedItems = filteredItems.slice(start, start + limit);
+
+    return {
+      items: paginatedItems,
+      total,
+      page,
+      limit,
+      pages
+    };
   },
 
   getById: async (id: number): Promise<Repuesto> => {
