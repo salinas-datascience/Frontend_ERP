@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Layout } from './components/layout'
-import { RepuestosForm, RepuestosDetail } from './pages/Repuestos'
+import { RepuestosForm, RepuestosDetail, RepuestosDescuento } from './pages/Repuestos'
 import RepuestosListOptimized from './pages/Repuestos/ListOptimized'
 import { ProveedoresList, ProveedoresForm, ProveedoresDetail } from './pages/Proveedores'
 import { MaquinasList, MaquinasForm, MaquinasDetail } from './pages/Maquinas'
@@ -15,6 +15,7 @@ function App() {
         
         <Route path="/repuestos" element={<RepuestosListOptimized />} />
         <Route path="/repuestos/nuevo" element={<RepuestosForm />} />
+        <Route path="/repuestos/descuento" element={<RepuestosDescuento />} />
         <Route path="/repuestos/:id" element={<RepuestosDetail />} />
         <Route path="/repuestos/:id/editar" element={<RepuestosForm />} />
         

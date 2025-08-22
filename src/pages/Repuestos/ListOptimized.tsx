@@ -1,17 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/Table';
 import { Button } from '../../components/ui/Button';
 import { DebouncedSearchInput } from '../../components/ui/DebouncedSearchInput';
 import { FilterSelect } from '../../components/ui/FilterSelect';
 import { Pagination } from '../../components/ui/Pagination';
 import { useRepuestosServerSearch } from '../../hooks/useRepuestosServerSearch';
+import { useInvalidateRepuestos } from '../../hooks/useInvalidateRepuestos';
 import { repuestosApi } from '../../api';
-import { Plus, Edit, Trash2, Eye, Filter, X, Server, Monitor } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Filter, X, Server, Monitor, Minus } from 'lucide-react';
 
 const RepuestosListOptimized: React.FC = () => {
-  const queryClient = useQueryClient();
+  const { invalidateRepuestos } = useInvalidateRepuestos();
   
   const {
     repuestos,
@@ -36,7 +37,7 @@ const RepuestosListOptimized: React.FC = () => {
   const deleteMutation = useMutation({
     mutationFn: repuestosApi.delete,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['repuestos'] });
+      invalidateRepuestos();
     },
   });
 
@@ -103,12 +104,20 @@ const RepuestosListOptimized: React.FC = () => {
             )}
           </div>
         </div>
-        <Link to="/repuestos/nuevo">
-          <Button variant="primary">
-            <Plus className="w-4 h-4 mr-2" />
-            Nuevo Repuesto
-          </Button>
-        </Link>
+        <div className="flex gap-3">
+          <Link to="/repuestos/descuento">
+            <Button variant="outline">
+              <Minus className="w-4 h-4 mr-2" />
+              Descontar Repuestos
+            </Button>
+          </Link>
+          <Link to="/repuestos/nuevo">
+            <Button variant="primary">
+              <Plus className="w-4 h-4 mr-2" />
+              Nuevo Repuesto
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Barra de búsqueda y filtros */}

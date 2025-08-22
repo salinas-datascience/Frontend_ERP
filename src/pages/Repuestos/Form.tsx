@@ -6,12 +6,14 @@ import type { RepuestoCreate, RepuestoUpdate } from '../../types';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { AlmacenamientoCRUD } from '../../components/AlmacenamientoCRUD';
+import { useInvalidateRepuestos } from '../../hooks/useInvalidateRepuestos';
 import { ArrowLeft, Save, Settings } from 'lucide-react';
 
 const RepuestosForm: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { invalidateRepuestos, invalidateRepuesto } = useInvalidateRepuestos();
   const isEditing = Boolean(id);
 
   const [formData, setFormData] = useState<RepuestoCreate>({
@@ -61,7 +63,7 @@ const RepuestosForm: React.FC = () => {
   const createMutation = useMutation({
     mutationFn: repuestosApi.create,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['repuestos'] });
+      invalidateRepuestos();
       navigate('/repuestos');
     },
   });
@@ -70,8 +72,7 @@ const RepuestosForm: React.FC = () => {
     mutationFn: ({ id, data }: { id: number; data: RepuestoUpdate }) =>
       repuestosApi.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['repuestos'] });
-      queryClient.invalidateQueries({ queryKey: ['repuesto', id] });
+      invalidateRepuesto(id);
       navigate('/repuestos');
     },
   });

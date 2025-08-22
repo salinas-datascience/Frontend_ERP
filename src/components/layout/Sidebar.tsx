@@ -7,6 +7,7 @@ import {
   Monitor, 
   History,
   Settings,
+  Minus,
 } from 'lucide-react';
 
 const navigationItems = [
@@ -14,6 +15,11 @@ const navigationItems = [
     name: 'Repuestos',
     href: '/repuestos',
     icon: Package,
+  },
+  {
+    name: 'Descuento Repuestos',
+    href: '/repuestos/descuento',
+    icon: Minus,
   },
   {
     name: 'Proveedores',
