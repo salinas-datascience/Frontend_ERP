@@ -71,3 +71,33 @@ export interface AsignarPaginasRequest {
   usuario_id: number;
   paginas_ids: number[];
 }
+
+export interface CreateRolRequest {
+  nombre: string;
+  descripcion?: string;
+  activo?: boolean;
+  permisos_ids?: number[];
+}
+
+export interface UpdateRolRequest {
+  nombre?: string;
+  descripcion?: string;
+  activo?: boolean;
+  permisos_ids?: number[];
+}
+
+export interface CreatePermisoRequest {
+  nombre: string;
+  descripcion?: string;
+  recurso: string;
+  accion: string;
+  activo?: boolean;
+}
+
+export interface UpdatePermisoRequest {
+  nombre?: string;
+  descripcion?: string;
+  recurso?: string;
+  accion?: string;
+  activo?: boolean;
+}

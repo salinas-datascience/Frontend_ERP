@@ -6,7 +6,11 @@ import type {
   Pagina,
   CreateUsuarioRequest,
   UpdateUsuarioRequest,
-  AsignarPaginasRequest
+  AsignarPaginasRequest,
+  CreateRolRequest,
+  UpdateRolRequest,
+  CreatePermisoRequest,
+  UpdatePermisoRequest
 } from '../types/admin';
 
 // Re-exportar tipos para compatibilidad
@@ -17,7 +21,11 @@ export type {
   Pagina,
   CreateUsuarioRequest,
   UpdateUsuarioRequest,
-  AsignarPaginasRequest
+  AsignarPaginasRequest,
+  CreateRolRequest,
+  UpdateRolRequest,
+  CreatePermisoRequest,
+  UpdatePermisoRequest
 } from '../types/admin';
 
 // Servicios de gestión de usuarios
@@ -102,13 +110,13 @@ export const adminRolesService = {
   },
 
   // Crear rol
-  async createRol(data: any): Promise<Rol> {
+  async createRol(data: CreateRolRequest): Promise<Rol> {
     const response = await apiClient.post<Rol>('/admin/roles', data);
     return response.data;
   },
 
   // Actualizar rol
-  async updateRol(id: number, data: any): Promise<Rol> {
+  async updateRol(id: number, data: UpdateRolRequest): Promise<Rol> {
     const response = await apiClient.put<Rol>(`/admin/roles/${id}`, data);
     return response.data;
   },
@@ -135,13 +143,13 @@ export const adminPermisosService = {
   },
 
   // Crear permiso
-  async createPermiso(data: any): Promise<Permiso> {
+  async createPermiso(data: CreatePermisoRequest): Promise<Permiso> {
     const response = await apiClient.post<Permiso>('/admin/permisos', data);
     return response.data;
   },
 
   // Actualizar permiso
-  async updatePermiso(id: number, data: any): Promise<Permiso> {
+  async updatePermiso(id: number, data: UpdatePermisoRequest): Promise<Permiso> {
     const response = await apiClient.put<Permiso>(`/admin/permisos/${id}`, data);
     return response.data;
   },

@@ -28,6 +28,7 @@ interface AuthContextType {
   changePassword: (passwords: ChangePasswordRequest) => Promise<void>;
   updateUser: (user: any) => void;
   clearError: () => void;
+  refreshUserPages: () => Promise<void>;
 }
 
 // Estado inicial
@@ -184,10 +185,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Guardar token
       tokenService.saveToken(loginResponse.access_token);
 
+      // Obtener páginas del usuario si no están en la respuesta
+      let userWithPages = loginResponse.usuario;
+      try {
+        if (!userWithPages.paginas_permitidas) {
+          const pagesResponse = await authService.getCurrentUserPages();
+          userWithPages = {
+            ...userWithPages,
+            paginas_permitidas: pagesResponse.paginas
+          };
+        }
+      } catch (pagesError) {
+        console.warn('No se pudieron cargar las páginas del usuario:', pagesError);
+      }
+
       dispatch({
         type: 'LOGIN_SUCCESS',
         payload: {
-          user: loginResponse.usuario,
+          user: userWithPages,
           token: loginResponse.access_token
         }
       });
@@ -243,6 +258,27 @@ export function AuthProvider({ children }: AuthProviderProps) {
     dispatch({ type: 'CLEAR_ERROR' });
   }, []);
 
+  // Función para refrescar las páginas del usuario
+  const refreshUserPages = useCallback(async () => {
+    try {
+      if (!authState.isAuthenticated || !authState.user) {
+        return;
+      }
+
+      const pagesResponse = await authService.getCurrentUserPages();
+      
+      // Actualizar el usuario con las páginas nuevas
+      const updatedUser = {
+        ...authState.user,
+        paginas_permitidas: pagesResponse.paginas
+      };
+
+      dispatch({ type: 'UPDATE_USER', payload: updatedUser });
+    } catch (error) {
+      console.error('Error al refrescar páginas del usuario:', error);
+    }
+  }, [authState.isAuthenticated, authState.user]);
+
   const contextValue: AuthContextType = {
     authState,
     login,
@@ -250,6 +286,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     changePassword,
     updateUser,
     clearError,
+    refreshUserPages,
   };
 
   return (

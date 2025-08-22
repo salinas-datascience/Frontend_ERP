@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '../../../components/ui/Button';
 import { adminUsersService, adminPaginasService } from '../../../api/admin';
+import { useAuth } from '../../../contexts/AuthContext';
 import type {
   Usuario,
   Pagina,
@@ -15,6 +16,7 @@ export default function UserPageAssignment() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { authState, refreshUserPages } = useAuth();
   const userId = Number(id);
 
   const [selectedPages, setSelectedPages] = useState<number[]>([]);
@@ -40,8 +42,14 @@ export default function UserPageAssignment() {
   // Mutation
   const assignPagesMutation = useMutation({
     mutationFn: (data: AsignarPaginasRequest) => adminUsersService.asignarPaginas(data),
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'usuarios', userId, 'paginas'] });
+      
+      // Si el usuario está editando sus propias páginas, refrescar el contexto
+      if (authState.user && authState.user.id === userId) {
+        await refreshUserPages();
+      }
+      
       navigate('/admin/usuarios');
     }
   });

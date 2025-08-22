@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { Layout } from './components/layout'
-import { RequireAuth, RequireAdmin } from './components/auth'
+import { RequireAuth, RequireAdmin, RequirePageAccess } from './components/auth'
 import { Login } from './pages/Auth'
 
 // Importar páginas existentes
@@ -14,6 +14,8 @@ import HistorialPage from './pages/Historial'
 
 // Importar páginas de administración
 import { AdminDashboard, UsuariosList, UsuarioForm, UserPageAssignment } from './pages/Admin'
+import { RolesList, RoleForm } from './pages/Admin/Roles'
+import { PermisosList, PermisosForm } from './pages/Admin/Permisos'
 
 // Importar páginas de autenticación
 import { ChangePassword } from './pages/Auth'
@@ -41,57 +43,185 @@ function App() {
           <Route index element={<Navigate to="/repuestos" replace />} />
           
           {/* Rutas de repuestos */}
-          <Route path="/repuestos" element={<RepuestosListOptimized />} />
-          <Route path="/repuestos/nuevo" element={<RepuestosForm />} />
-          <Route path="/repuestos/descuento" element={<RepuestosDescuento />} />
-          <Route path="/repuestos/:id" element={<RepuestosDetail />} />
-          <Route path="/repuestos/:id/editar" element={<RepuestosForm />} />
+          <Route path="/repuestos" element={
+            <RequirePageAccess pagePath="/repuestos">
+              <RepuestosListOptimized />
+            </RequirePageAccess>
+          } />
+          <Route path="/repuestos/nuevo" element={
+            <RequirePageAccess pagePath="/repuestos">
+              <RepuestosForm />
+            </RequirePageAccess>
+          } />
+          <Route path="/repuestos/descuento" element={
+            <RequirePageAccess pagePath="/repuestos">
+              <RepuestosDescuento />
+            </RequirePageAccess>
+          } />
+          <Route path="/repuestos/:id" element={
+            <RequirePageAccess pagePath="/repuestos">
+              <RepuestosDetail />
+            </RequirePageAccess>
+          } />
+          <Route path="/repuestos/:id/editar" element={
+            <RequirePageAccess pagePath="/repuestos">
+              <RepuestosForm />
+            </RequirePageAccess>
+          } />
           
           {/* Rutas de proveedores */}
-          <Route path="/proveedores" element={<ProveedoresList />} />
-          <Route path="/proveedores/nuevo" element={<ProveedoresForm />} />
-          <Route path="/proveedores/:id" element={<ProveedoresDetail />} />
-          <Route path="/proveedores/:id/editar" element={<ProveedoresForm />} />
+          <Route path="/proveedores" element={
+            <RequirePageAccess pagePath="/proveedores">
+              <ProveedoresList />
+            </RequirePageAccess>
+          } />
+          <Route path="/proveedores/nuevo" element={
+            <RequirePageAccess pagePath="/proveedores">
+              <ProveedoresForm />
+            </RequirePageAccess>
+          } />
+          <Route path="/proveedores/:id" element={
+            <RequirePageAccess pagePath="/proveedores">
+              <ProveedoresDetail />
+            </RequirePageAccess>
+          } />
+          <Route path="/proveedores/:id/editar" element={
+            <RequirePageAccess pagePath="/proveedores">
+              <ProveedoresForm />
+            </RequirePageAccess>
+          } />
           
           {/* Rutas de máquinas */}
-          <Route path="/maquinas" element={<MaquinasList />} />
-          <Route path="/maquinas/nuevo" element={<MaquinasForm />} />
-          <Route path="/maquinas/:id" element={<MaquinasDetail />} />
-          <Route path="/maquinas/:id/editar" element={<MaquinasForm />} />
+          <Route path="/maquinas" element={
+            <RequirePageAccess pagePath="/maquinas">
+              <MaquinasList />
+            </RequirePageAccess>
+          } />
+          <Route path="/maquinas/nuevo" element={
+            <RequirePageAccess pagePath="/maquinas">
+              <MaquinasForm />
+            </RequirePageAccess>
+          } />
+          <Route path="/maquinas/:id" element={
+            <RequirePageAccess pagePath="/maquinas">
+              <MaquinasDetail />
+            </RequirePageAccess>
+          } />
+          <Route path="/maquinas/:id/editar" element={
+            <RequirePageAccess pagePath="/maquinas">
+              <MaquinasForm />
+            </RequirePageAccess>
+          } />
           
           {/* Rutas de modelos de máquinas */}
-          <Route path="/modelos-maquinas" element={<ModelosMaquinasList />} />
-          <Route path="/modelos-maquinas/nuevo" element={<ModelosMaquinasForm />} />
-          <Route path="/modelos-maquinas/:id" element={<ModelosMaquinasDetail />} />
-          <Route path="/modelos-maquinas/:id/editar" element={<ModelosMaquinasForm />} />
+          <Route path="/modelos-maquinas" element={
+            <RequirePageAccess pagePath="/modelos-maquinas">
+              <ModelosMaquinasList />
+            </RequirePageAccess>
+          } />
+          <Route path="/modelos-maquinas/nuevo" element={
+            <RequirePageAccess pagePath="/modelos-maquinas">
+              <ModelosMaquinasForm />
+            </RequirePageAccess>
+          } />
+          <Route path="/modelos-maquinas/:id" element={
+            <RequirePageAccess pagePath="/modelos-maquinas">
+              <ModelosMaquinasDetail />
+            </RequirePageAccess>
+          } />
+          <Route path="/modelos-maquinas/:id/editar" element={
+            <RequirePageAccess pagePath="/modelos-maquinas">
+              <ModelosMaquinasForm />
+            </RequirePageAccess>
+          } />
           
           {/* Ruta de historial */}
-          <Route path="/historial" element={<HistorialPage />} />
+          <Route path="/historial" element={
+            <RequirePageAccess pagePath="/historial">
+              <HistorialPage />
+            </RequirePageAccess>
+          } />
           
           {/* Rutas de administración (solo para admins) */}
           <Route path="/admin" element={
             <RequireAdmin>
-              <AdminDashboard />
+              <RequirePageAccess pagePath="/admin">
+                <AdminDashboard />
+              </RequirePageAccess>
             </RequireAdmin>
           } />
           <Route path="/admin/usuarios" element={
             <RequireAdmin>
-              <UsuariosList />
+              <RequirePageAccess pagePath="/admin/usuarios">
+                <UsuariosList />
+              </RequirePageAccess>
             </RequireAdmin>
           } />
           <Route path="/admin/usuarios/nuevo" element={
             <RequireAdmin>
-              <UsuarioForm />
+              <RequirePageAccess pagePath="/admin/usuarios">
+                <UsuarioForm />
+              </RequirePageAccess>
             </RequireAdmin>
           } />
           <Route path="/admin/usuarios/:id" element={
             <RequireAdmin>
-              <UsuarioForm />
+              <RequirePageAccess pagePath="/admin/usuarios">
+                <UsuarioForm />
+              </RequirePageAccess>
             </RequireAdmin>
           } />
           <Route path="/admin/usuarios/:id/paginas" element={
             <RequireAdmin>
-              <UserPageAssignment />
+              <RequirePageAccess pagePath="/admin/usuarios">
+                <UserPageAssignment />
+              </RequirePageAccess>
+            </RequireAdmin>
+          } />
+          
+          {/* Rutas de roles */}
+          <Route path="/admin/roles" element={
+            <RequireAdmin>
+              <RequirePageAccess pagePath="/admin/roles">
+                <RolesList />
+              </RequirePageAccess>
+            </RequireAdmin>
+          } />
+          <Route path="/admin/roles/nuevo" element={
+            <RequireAdmin>
+              <RequirePageAccess pagePath="/admin/roles">
+                <RoleForm />
+              </RequirePageAccess>
+            </RequireAdmin>
+          } />
+          <Route path="/admin/roles/:id" element={
+            <RequireAdmin>
+              <RequirePageAccess pagePath="/admin/roles">
+                <RoleForm />
+              </RequirePageAccess>
+            </RequireAdmin>
+          } />
+          
+          {/* Rutas de permisos */}
+          <Route path="/admin/permisos" element={
+            <RequireAdmin>
+              <RequirePageAccess pagePath="/admin/permisos">
+                <PermisosList />
+              </RequirePageAccess>
+            </RequireAdmin>
+          } />
+          <Route path="/admin/permisos/nuevo" element={
+            <RequireAdmin>
+              <RequirePageAccess pagePath="/admin/permisos">
+                <PermisosForm />
+              </RequirePageAccess>
+            </RequireAdmin>
+          } />
+          <Route path="/admin/permisos/:id" element={
+            <RequireAdmin>
+              <RequirePageAccess pagePath="/admin/permisos">
+                <PermisosForm />
+              </RequirePageAccess>
             </RequireAdmin>
           } />
         </Route>

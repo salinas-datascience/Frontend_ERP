@@ -1,6 +1,5 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Shield, Key, Settings, Activity, UserPlus, RefreshCw } from 'lucide-react';
+import { Users, Shield, Key, Activity, UserPlus, RefreshCw } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../contexts/AuthContext';
 import { adminUsersService, adminRolesService, adminPaginasService } from '../../api/admin';
@@ -47,7 +46,7 @@ export default function AdminDashboard() {
       title: 'Roles',
       description: 'Administrar roles del sistema',
       icon: Shield,
-      link: '/admin/usuarios', // Por ahora redirige a usuarios
+      link: '/admin/roles',
       bgColor: 'bg-green-600',
       textColor: 'text-green-400',
       bgLight: 'bg-gray-700',
@@ -56,10 +55,10 @@ export default function AdminDashboard() {
       loading: loadingRoles
     },
     {
-      title: 'Páginas',
-      description: 'Gestionar páginas del sistema',
-      icon: Settings,
-      link: '/admin/usuarios', // Por ahora redirige a usuarios
+      title: 'Permisos',
+      description: 'Gestionar permisos granulares',
+      icon: Key,
+      link: '/admin/permisos',
       bgColor: 'bg-purple-600',
       textColor: 'text-purple-400',
       bgLight: 'bg-gray-700',
@@ -99,6 +98,24 @@ export default function AdminDashboard() {
       bgColor: 'bg-green-600',
       textColor: 'text-white',
       hoverColor: 'hover:bg-green-700'
+    },
+    {
+      title: 'Gestionar Roles',
+      description: 'Administrar roles del sistema',
+      icon: Shield,
+      link: '/admin/roles',
+      bgColor: 'bg-purple-600',
+      textColor: 'text-white',
+      hoverColor: 'hover:bg-purple-700'
+    },
+    {
+      title: 'Gestionar Permisos',
+      description: 'Configurar permisos granulares',
+      icon: Key,
+      link: '/admin/permisos',
+      bgColor: 'bg-orange-600',
+      textColor: 'text-white',
+      hoverColor: 'hover:bg-orange-700'
     }
   ];
 
@@ -158,7 +175,7 @@ export default function AdminDashboard() {
         <h2 className="text-xl font-bold text-gray-100 mb-6">
           Acciones Rápidas
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {quickActions.map((action, index) => (
             <Link
               key={index}
