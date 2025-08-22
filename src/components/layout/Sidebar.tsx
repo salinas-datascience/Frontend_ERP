@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '../../lib/utils';
+import { useAuth } from '../../contexts/AuthContext';
 import { 
   Package, 
   Users, 
@@ -8,6 +9,7 @@ import {
   History,
   Settings,
   Minus,
+  Shield,
 } from 'lucide-react';
 
 const navigationItems = [
@@ -45,6 +47,7 @@ const navigationItems = [
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
+  const { authState } = useAuth();
 
   return (
     <aside className="bg-gray-800 w-64 min-h-screen border-r border-gray-700">
@@ -71,6 +74,31 @@ const Sidebar: React.FC = () => {
               </li>
             );
           })}
+
+          {/* Separador y sección de administración */}
+          {authState.user?.es_admin && (
+            <>
+              <li className="pt-4 mt-4 border-t border-gray-700">
+                <div className="text-xs font-medium text-gray-400 uppercase tracking-wider px-3 py-2">
+                  Administración
+                </div>
+              </li>
+              <li>
+                <Link
+                  to="/admin"
+                  className={cn(
+                    'flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                    location.pathname.startsWith('/admin')
+                      ? 'bg-purple-600 text-white'
+                      : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                  )}
+                >
+                  <Shield className="w-5 h-5 mr-3" />
+                  Panel de Admin
+                </Link>
+              </li>
+            </>
+          )}
         </ul>
       </nav>
     </aside>
