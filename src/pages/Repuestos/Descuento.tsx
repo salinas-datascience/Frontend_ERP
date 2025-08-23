@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/Table';
 import { Button } from '../../components/ui/Button';
@@ -8,7 +9,7 @@ import { FilterSelect } from '../../components/ui/FilterSelect';
 import { repuestosApi, maquinasApi, historialApi } from '../../api';
 import { useRepuestosSearch } from '../../hooks/useRepuestosSearch';
 import { useInvalidateRepuestos } from '../../hooks/useInvalidateRepuestos';
-import { Minus, Search, AlertCircle, CheckCircle, Filter, X } from 'lucide-react';
+import { Minus, Search, AlertCircle, CheckCircle, Filter, X, Clock } from 'lucide-react';
 import type { Repuesto, Maquina, HistorialRepuestoCreate } from '../../types';
 
 interface FormData {
@@ -53,9 +54,11 @@ const DescuentoRepuestos: React.FC = () => {
     queryFn: maquinasApi.getAll,
   });
 
-  const { data: historial = [], isLoading: historialLoading } = useQuery({
+  const { data: historial = [], isLoading: historialLoading, error: historialError } = useQuery({
     queryKey: ['historial'],
     queryFn: historialApi.getAll,
+    retry: 1,
+    retryDelay: 1000,
   });
 
   const descuentoMutation = useMutation({
@@ -70,6 +73,12 @@ const DescuentoRepuestos: React.FC = () => {
     },
     onError: (error: any) => {
       console.error('Error al crear descuento:', error);
+      // Mostrar error específico si es un problema de backend
+      if (error?.response?.status === 500) {
+        alert('Error en el servidor: No se pudo guardar el descuento. Verifica que la base de datos esté configurada correctamente.');
+      } else {
+        alert('Error al registrar el descuento. Inténtalo de nuevo.');
+      }
     },
   });
 
@@ -437,10 +446,27 @@ const DescuentoRepuestos: React.FC = () => {
 
       {/* Historial reciente */}
       <div className="bg-gray-800 rounded-lg p-6">
-        <h2 className="text-xl font-semibold text-white mb-4">Historial Reciente</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-white">Historial Reciente</h2>
+          <Link to="/historial">
+            <Button variant="outline" size="sm">
+              <Clock className="w-4 h-4 mr-2" />
+              Ver Historial Completo
+            </Button>
+          </Link>
+        </div>
         
         {historialLoading ? (
           <div className="text-gray-400 text-center py-4">Cargando historial...</div>
+        ) : historialError ? (
+          <div className="text-center py-8">
+            <div className="text-yellow-400 text-sm mb-2">
+              ⚠️ No se pudo cargar el historial
+            </div>
+            <div className="text-gray-500 text-xs">
+              El servicio de historial no está disponible
+            </div>
+          </div>
         ) : (
           <div className="overflow-hidden">
             <Table>

@@ -44,18 +44,18 @@ export const useRepuestosServerSearch = () => {
     limit: itemsPerPage,
   };
 
-  // Server-side search query
+  // Server-side search query (disabled when using ubicacion filter)
   const { data: searchResponse, isLoading: isSearchLoading, error: searchError } = useQuery({
     queryKey: ['repuestos-search', searchParams],
     queryFn: () => repuestosApi.search(searchParams),
-    enabled: true, // Always enabled, will use server-side search if available
+    enabled: !filters.ubicacion || filters.ubicacion === 'all', // Disable server search when ubicacion filter is active
   });
 
-  // Fallback to client-side search if server search is not available
+  // Always fetch all repuestos to generate filter options (regardless of server search status)
   const { data: allRepuestos, isLoading: isAllLoading, error: allError } = useQuery({
     queryKey: ['repuestos'],
     queryFn: repuestosApi.getAll,
-    enabled: !searchResponse && !!searchError, // Only fetch all if server search fails
+    enabled: true, // Always fetch for filter options
   });
 
   // Get providers for filter options
@@ -78,8 +78,8 @@ export const useRepuestosServerSearch = () => {
 
   const hasActiveFilters = Object.values(filters).some(value => value !== '' && value !== 'all');
 
-  // Determine if we're using server-side search or fallback
-  const isUsingServerSearch = !!searchResponse && !searchError;
+  // Determine if we're using server-side search or fallback (force client-side when ubicacion filter is active)
+  const isUsingServerSearch = !!searchResponse && !searchError && (!filters.ubicacion || filters.ubicacion === 'all');
   const isLoading = isUsingServerSearch ? isSearchLoading : isAllLoading;
   const error = isUsingServerSearch ? searchError : allError;
 
@@ -90,7 +90,7 @@ export const useRepuestosServerSearch = () => {
   let endIndex: number;
 
   if (isUsingServerSearch && searchResponse) {
-    // Server-side search results
+    // Server-side search results (ubicacion filter disabled here)
     repuestos = searchResponse.items;
     totalItems = searchResponse.total;
     totalPages = searchResponse.pages;
@@ -107,6 +107,8 @@ export const useRepuestosServerSearch = () => {
           repuesto.nombre.toLowerCase().includes(searchTerm) ||
           (repuesto.detalle && repuesto.detalle.toLowerCase().includes(searchTerm)) ||
           (repuesto.ubicacion && repuesto.ubicacion.toLowerCase().includes(searchTerm)) ||
+          (repuesto.almacenamiento?.nombre && repuesto.almacenamiento.nombre.toLowerCase().includes(searchTerm)) ||
+          (repuesto.almacenamiento?.codigo && repuesto.almacenamiento.codigo.toLowerCase().includes(searchTerm)) ||
           (repuesto.proveedor?.nombre && repuesto.proveedor.nombre.toLowerCase().includes(searchTerm));
         
         if (!matchesSearch) return false;
@@ -124,9 +126,19 @@ export const useRepuestosServerSearch = () => {
 
       if (filters.ubicacion && filters.ubicacion !== 'all') {
         if (filters.ubicacion === 'none') {
-          if (repuesto.ubicacion) return false;
+          if (repuesto.ubicacion || repuesto.almacenamiento) return false;
         } else {
-          if (!repuesto.ubicacion || !repuesto.ubicacion.toLowerCase().includes(filters.ubicacion.toLowerCase())) {
+          // Verificar ubicación legacy
+          const ubicacionMatch = repuesto.ubicacion === filters.ubicacion;
+          
+          // Verificar almacenamiento (formato "codigo - nombre")
+          const almacenamientoString = repuesto.almacenamiento 
+            ? `${repuesto.almacenamiento.codigo} - ${repuesto.almacenamiento.nombre}`
+            : null;
+          const almacenamientoMatch = almacenamientoString === filters.ubicacion;
+          
+          
+          if (!ubicacionMatch && !almacenamientoMatch) {
             return false;
           }
         }
@@ -162,10 +174,24 @@ export const useRepuestosServerSearch = () => {
     endIndex = 0;
   }
 
-  // Get unique options for filters (from all data or server metadata)
+  // Get unique options for filters (always from allRepuestos to ensure we have all options)
   const uniqueProveedores = proveedores?.filter(p => p.id && p.nombre) || [];
-  const uniqueUbicaciones = allRepuestos 
-    ? [...new Set(allRepuestos.filter((r: Repuesto) => r.ubicacion).map((r: Repuesto) => r.ubicacion!))]
+  const uniqueUbicaciones = allRepuestos && allRepuestos.length > 0
+    ? (() => {
+        const ubicaciones = new Set<string>();
+        allRepuestos.forEach((r: Repuesto) => {
+          // Agregar ubicaciones legacy
+          if (r.ubicacion) {
+            ubicaciones.add(r.ubicacion);
+          }
+          // Agregar almacenamientos
+          if (r.almacenamiento && r.almacenamiento.codigo && r.almacenamiento.nombre) {
+            ubicaciones.add(`${r.almacenamiento.codigo} - ${r.almacenamiento.nombre}`);
+          }
+        });
+        
+        return Array.from(ubicaciones).sort();
+      })()
     : [];
 
   return {

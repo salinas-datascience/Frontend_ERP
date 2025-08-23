@@ -39,6 +39,8 @@ export const useRepuestosSearch = () => {
           repuesto.nombre.toLowerCase().includes(searchTerm) ||
           (repuesto.detalle && repuesto.detalle.toLowerCase().includes(searchTerm)) ||
           (repuesto.ubicacion && repuesto.ubicacion.toLowerCase().includes(searchTerm)) ||
+          (repuesto.almacenamiento?.nombre && repuesto.almacenamiento.nombre.toLowerCase().includes(searchTerm)) ||
+          (repuesto.almacenamiento?.codigo && repuesto.almacenamiento.codigo.toLowerCase().includes(searchTerm)) ||
           (repuesto.proveedor?.nombre && repuesto.proveedor.nombre.toLowerCase().includes(searchTerm));
         
         if (!matchesSearch) return false;
@@ -55,12 +57,22 @@ export const useRepuestosSearch = () => {
         }
       }
 
-      // Filtro por ubicación
+      // Filtro por ubicación/almacenamiento
       if (filters.ubicacion && filters.ubicacion !== 'all') {
         if (filters.ubicacion === 'none') {
-          if (repuesto.ubicacion) return false;
+          if (repuesto.ubicacion || repuesto.almacenamiento) return false;
         } else {
-          if (!repuesto.ubicacion || !repuesto.ubicacion.toLowerCase().includes(filters.ubicacion.toLowerCase())) {
+          // Verificar ubicación legacy
+          const ubicacionMatch = repuesto.ubicacion === filters.ubicacion;
+          
+          // Verificar almacenamiento (formato "codigo - nombre")
+          const almacenamientoString = repuesto.almacenamiento 
+            ? `${repuesto.almacenamiento.codigo} - ${repuesto.almacenamiento.nombre}`
+            : null;
+          const almacenamientoMatch = almacenamientoString === filters.ubicacion;
+          
+          
+          if (!ubicacionMatch && !almacenamientoMatch) {
             return false;
           }
         }
@@ -118,11 +130,21 @@ export const useRepuestosSearch = () => {
 
   const uniqueUbicaciones = useMemo(() => {
     if (!allRepuestos) return [];
-    const ubicaciones = allRepuestos
-      .filter((r: Repuesto) => r.ubicacion)
-      .map((r: Repuesto) => r.ubicacion!)
-      .filter((ubicacion, index, self) => self.indexOf(ubicacion) === index);
-    return ubicaciones;
+    
+    const ubicaciones = new Set<string>();
+    
+    allRepuestos.forEach((r: Repuesto) => {
+      // Agregar ubicaciones legacy
+      if (r.ubicacion) {
+        ubicaciones.add(r.ubicacion);
+      }
+      // Agregar almacenamientos
+      if (r.almacenamiento) {
+        ubicaciones.add(`${r.almacenamiento.codigo} - ${r.almacenamiento.nombre}`);
+      }
+    });
+    
+    return Array.from(ubicaciones).sort();
   }, [allRepuestos]);
 
   return {
