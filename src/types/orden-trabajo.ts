@@ -56,6 +56,7 @@ export interface OrdenTrabajo {
   descripcion?: string;
   maquina_id: number;
   usuario_asignado_id: number;
+  tipo_mantenimiento: 'preventivo' | 'predictivo' | 'correctivo';
   nivel_criticidad: 'baja' | 'media' | 'alta' | 'critica';
   estado: 'pendiente' | 'en_proceso' | 'completada' | 'cancelada';
   fecha_programada: string;
@@ -76,6 +77,7 @@ export interface OrdenTrabajoListItem {
   id: number;
   titulo: string;
   estado: 'pendiente' | 'en_proceso' | 'completada' | 'cancelada';
+  tipo_mantenimiento: 'preventivo' | 'predictivo' | 'correctivo';
   nivel_criticidad: 'baja' | 'media' | 'alta' | 'critica';
   fecha_programada: string;
   fecha_creacion: string;
@@ -90,6 +92,7 @@ export interface OrdenTrabajoCreate {
   descripcion?: string;
   maquina_id: number;
   usuario_asignado_id: number;
+  tipo_mantenimiento: 'preventivo' | 'predictivo' | 'correctivo';
   nivel_criticidad: 'baja' | 'media' | 'alta' | 'critica';
   fecha_programada: string;
   tiempo_estimado_horas?: number;
@@ -100,6 +103,7 @@ export interface OrdenTrabajoUpdate {
   descripcion?: string;
   maquina_id?: number;
   usuario_asignado_id?: number;
+  tipo_mantenimiento?: 'preventivo' | 'predictivo' | 'correctivo';
   nivel_criticidad?: 'baja' | 'media' | 'alta' | 'critica';
   fecha_programada?: string;
   tiempo_estimado_horas?: number;
@@ -128,6 +132,7 @@ export interface OrdenTrabajoFilters {
   search?: string;
   estado?: string;
   nivel_criticidad?: string;
+  tipo_mantenimiento?: string;
   usuario_asignado_id?: number;
   maquina_id?: number;
   fecha_inicio?: string;
@@ -149,4 +154,10 @@ export const NIVELES_CRITICIDAD = [
   { value: 'media', label: 'Media', color: 'bg-yellow-500' },
   { value: 'alta', label: 'Alta', color: 'bg-orange-500' },
   { value: 'critica', label: 'Crítica', color: 'bg-red-500' }
+] as const;
+
+export const TIPOS_MANTENIMIENTO = [
+  { value: 'preventivo', label: 'Preventivo', color: 'bg-green-500', icon: '🛡️' },
+  { value: 'predictivo', label: 'Predictivo', color: 'bg-blue-500', icon: '📊' },
+  { value: 'correctivo', label: 'Correctivo', color: 'bg-red-500', icon: '🔧' }
 ] as const;

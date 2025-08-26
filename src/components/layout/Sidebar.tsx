@@ -18,6 +18,7 @@ import {
   ClipboardList,
   Warehouse,
   ShoppingCart,
+  BarChart3,
   type LucideIcon
 } from 'lucide-react';
 
@@ -36,6 +37,7 @@ const iconMap: Record<string, LucideIcon> = {
   'ClipboardList': ClipboardList,
   'Warehouse': Warehouse,
   'ShoppingCart': ShoppingCart,
+  'BarChart3': BarChart3,
   'Minus': Minus,
 };
 

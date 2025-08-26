@@ -10,12 +10,14 @@ import { Badge } from '../../components/ui/Badge';
 import { ordenesTrabajoApi, maquinasApi } from '../../api';
 import { Plus, Edit, Trash2, Eye, Filter, X, Users, Calendar, AlertTriangle } from 'lucide-react';
 import type { OrdenTrabajo, OrdenTrabajoFilters } from '../../types';
+import { TIPOS_MANTENIMIENTO, NIVELES_CRITICIDAD, ESTADOS_ORDEN_TRABAJO } from '../../types/orden-trabajo';
 
 const OrdenesTrabajoList: React.FC = () => {
   const queryClient = useQueryClient();
   const [search, setSearch] = React.useState('');
   const [estadoFilter, setEstadoFilter] = React.useState('all');
   const [criticidadFilter, setCriticidadFilter] = React.useState('all');
+  const [tipoMantenimientoFilter, setTipoMantenimientoFilter] = React.useState('all');
   const [maquinaFilter, setMaquinaFilter] = React.useState('all');
   const [page, setPage] = React.useState(1);
   const itemsPerPage = 10;
@@ -56,11 +58,12 @@ const OrdenesTrabajoList: React.FC = () => {
 
       const matchesEstado = estadoFilter === 'all' || orden.estado === estadoFilter;
       const matchesCriticidad = criticidadFilter === 'all' || orden.nivel_criticidad === criticidadFilter;
+      const matchesTipoMantenimiento = tipoMantenimientoFilter === 'all' || orden.tipo_mantenimiento === tipoMantenimientoFilter;
       const matchesMaquina = maquinaFilter === 'all' || orden.maquina_id.toString() === maquinaFilter;
 
-      return matchesSearch && matchesEstado && matchesCriticidad && matchesMaquina;
+      return matchesSearch && matchesEstado && matchesCriticidad && matchesTipoMantenimiento && matchesMaquina;
     });
-  }, [ordenes, search, estadoFilter, criticidadFilter, maquinaFilter]);
+  }, [ordenes, search, estadoFilter, criticidadFilter, tipoMantenimientoFilter, maquinaFilter]);
 
   const totalItems = filteredOrdenes.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -68,12 +71,13 @@ const OrdenesTrabajoList: React.FC = () => {
   const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
   const currentOrdenes = filteredOrdenes.slice(startIndex, endIndex);
 
-  const hasActiveFilters = search !== '' || estadoFilter !== 'all' || criticidadFilter !== 'all' || maquinaFilter !== 'all';
+  const hasActiveFilters = search !== '' || estadoFilter !== 'all' || criticidadFilter !== 'all' || tipoMantenimientoFilter !== 'all' || maquinaFilter !== 'all';
 
   const clearFilters = () => {
     setSearch('');
     setEstadoFilter('all');
     setCriticidadFilter('all');
+    setTipoMantenimientoFilter('all');
     setMaquinaFilter('all');
     setPage(1);
   };
@@ -132,6 +136,18 @@ const OrdenesTrabajoList: React.FC = () => {
     );
   };
 
+  const getTipoMantenimientoBadge = (tipo: string) => {
+    const tipoData = TIPOS_MANTENIMIENTO.find(t => t.value === tipo);
+    if (!tipoData) return <Badge>{tipo}</Badge>;
+    
+    return (
+      <Badge className={`${tipoData.color} text-white`}>
+        <span className="mr-1">{tipoData.icon}</span>
+        {tipoData.label}
+      </Badge>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -150,18 +166,26 @@ const OrdenesTrabajoList: React.FC = () => {
 
   const estadoOptions = [
     { value: 'all', label: 'Todos los estados' },
-    { value: 'pendiente', label: 'Pendiente' },
-    { value: 'en_proceso', label: 'En Proceso' },
-    { value: 'completada', label: 'Completada' },
-    { value: 'cancelada', label: 'Cancelada' }
+    ...ESTADOS_ORDEN_TRABAJO.map(estado => ({ 
+      value: estado.value, 
+      label: estado.label 
+    }))
   ];
 
   const criticidadOptions = [
     { value: 'all', label: 'Todas las criticidades' },
-    { value: 'baja', label: 'Baja' },
-    { value: 'media', label: 'Media' },
-    { value: 'alta', label: 'Alta' },
-    { value: 'critica', label: 'Crítica' }
+    ...NIVELES_CRITICIDAD.map(criticidad => ({ 
+      value: criticidad.value, 
+      label: criticidad.label 
+    }))
+  ];
+
+  const tipoMantenimientoOptions = [
+    { value: 'all', label: 'Todos los tipos' },
+    ...TIPOS_MANTENIMIENTO.map(tipo => ({ 
+      value: tipo.value, 
+      label: tipo.label 
+    }))
   ];
 
   const maquinaOptions = [
@@ -245,7 +269,7 @@ const OrdenesTrabajoList: React.FC = () => {
           </div>
 
           <div className="flex flex-col lg:flex-row gap-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 flex-1">
               <FilterSelect
                 label="Estado"
                 value={estadoFilter}
@@ -258,6 +282,13 @@ const OrdenesTrabajoList: React.FC = () => {
                 value={criticidadFilter}
                 onChange={(e) => setCriticidadFilter(e.target.value)}
                 options={criticidadOptions}
+              />
+              
+              <FilterSelect
+                label="Tipo"
+                value={tipoMantenimientoFilter}
+                onChange={(e) => setTipoMantenimientoFilter(e.target.value)}
+                options={tipoMantenimientoOptions}
               />
 
               <FilterSelect
@@ -303,6 +334,7 @@ const OrdenesTrabajoList: React.FC = () => {
                 <TableHead>Título</TableHead>
                 <TableHead>Máquina</TableHead>
                 <TableHead>Técnico Asignado</TableHead>
+                <TableHead>Tipo</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Criticidad</TableHead>
                 <TableHead>Fecha Programada</TableHead>
@@ -334,6 +366,7 @@ const OrdenesTrabajoList: React.FC = () => {
                     <TableCell>
                       {orden.usuario_asignado.nombre_completo || orden.usuario_asignado.username}
                     </TableCell>
+                    <TableCell>{getTipoMantenimientoBadge(orden.tipo_mantenimiento)}</TableCell>
                     <TableCell>{getEstadoBadge(orden.estado)}</TableCell>
                     <TableCell>{getCriticidadBadge(orden.nivel_criticidad)}</TableCell>
                     <TableCell>

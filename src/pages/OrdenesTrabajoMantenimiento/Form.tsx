@@ -9,12 +9,14 @@ import { ordenesTrabajoApi, maquinasApi } from '../../api';
 import { adminApi } from '../../api/admin';
 import { Save, ArrowLeft, Upload, X, Paperclip } from 'lucide-react';
 import type { OrdenTrabajoCreate, OrdenTrabajoUpdate, ArchivoOT } from '../../types';
+import { TIPOS_MANTENIMIENTO, NIVELES_CRITICIDAD } from '../../types/orden-trabajo';
 
 interface FormData {
   titulo: string;
   descripcion: string;
   maquina_id: number;
   usuario_asignado_id: number;
+  tipo_mantenimiento: 'preventivo' | 'predictivo' | 'correctivo';
   nivel_criticidad: 'baja' | 'media' | 'alta' | 'critica';
   fecha_programada: string;
   tiempo_estimado_horas: number | null;
@@ -39,6 +41,7 @@ const OrdenTrabajoForm: React.FC = () => {
     descripcion: '',
     maquina_id: 0,
     usuario_asignado_id: 0,
+    tipo_mantenimiento: 'correctivo',
     nivel_criticidad: 'media',
     fecha_programada: new Date().toISOString().split('T')[0],
     tiempo_estimado_horas: null
@@ -63,6 +66,7 @@ const OrdenTrabajoForm: React.FC = () => {
         descripcion: ordenExistente.descripcion || '',
         maquina_id: ordenExistente.maquina_id,
         usuario_asignado_id: ordenExistente.usuario_asignado_id,
+        tipo_mantenimiento: ordenExistente.tipo_mantenimiento,
         nivel_criticidad: ordenExistente.nivel_criticidad,
         fecha_programada: ordenExistente.fecha_programada.split('T')[0],
         tiempo_estimado_horas: ordenExistente.tiempo_estimado_horas
@@ -280,12 +284,15 @@ const OrdenTrabajoForm: React.FC = () => {
       }))
   ];
 
-  const criticidadOptions = [
-    { value: 'baja', label: 'Baja' },
-    { value: 'media', label: 'Media' },
-    { value: 'alta', label: 'Alta' },
-    { value: 'critica', label: 'Crítica' }
-  ];
+  const tipoMantenimientoOptions = TIPOS_MANTENIMIENTO.map(tipo => ({
+    value: tipo.value,
+    label: tipo.label
+  }));
+
+  const criticidadOptions = NIVELES_CRITICIDAD.map(nivel => ({
+    value: nivel.value,
+    label: nivel.label
+  }));
 
   const selectedMaquina = maquinas.find(m => m.id === Number(formData.maquina_id));
 
@@ -333,6 +340,17 @@ const OrdenTrabajoForm: React.FC = () => {
                   rows={4}
                   className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Describe detalladamente las tareas a realizar..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Tipo de Mantenimiento *
+                </label>
+                <FilterSelect
+                  value={formData.tipo_mantenimiento}
+                  onChange={(e) => handleInputChange('tipo_mantenimiento', e.target.value)}
+                  options={tipoMantenimientoOptions}
                 />
               </div>
 

@@ -8,7 +8,7 @@ import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { Input } from '../../components/ui/Input';
 import { ordenesTrabajoApi } from '../../api';
-import { Clock, CheckCircle, Play, MessageSquare, Filter, AlertCircle, Upload, X, Paperclip } from 'lucide-react';
+import { Clock, CheckCircle, Play, MessageSquare, Filter, AlertCircle, Upload, X, Paperclip, EyeOff } from 'lucide-react';
 import type { OrdenTrabajo, ComentarioOT, ArchivoComentarioOT } from '../../types';
 
 const MisOrdenesTrabajoList: React.FC = () => {
@@ -19,6 +19,7 @@ const MisOrdenesTrabajoList: React.FC = () => {
   const [showCommentModal, setShowCommentModal] = React.useState(false);
   const [newComment, setNewComment] = React.useState('');
   const [selectedFiles, setSelectedFiles] = React.useState<File[]>([]);
+  const [hiddenOrders, setHiddenOrders] = React.useState<Set<number>>(new Set());
 
   const { data: misOrdenes = [], isLoading, error } = useQuery({
     queryKey: ['mis-ordenes-trabajo'],
@@ -57,8 +58,23 @@ const MisOrdenesTrabajoList: React.FC = () => {
     },
   });
 
+  // Función para ocultar una orden manualmente
+  const handleHideOrder = (ordenId: number) => {
+    setHiddenOrders(prev => new Set([...prev, ordenId]));
+  };
+
+  // Función para mostrar todas las órdenes ocultas
+  const handleShowHiddenOrders = () => {
+    setHiddenOrders(new Set());
+  };
+
   const filteredOrdenes = React.useMemo(() => {
     return misOrdenes.filter((orden) => {
+      // No mostrar órdenes que están ocultas manualmente
+      if (hiddenOrders.has(orden.id)) {
+        return false;
+      }
+
       const searchLower = search.toLowerCase();
       const matchesSearch = 
         orden.titulo.toLowerCase().includes(searchLower) ||
@@ -70,7 +86,7 @@ const MisOrdenesTrabajoList: React.FC = () => {
 
       return matchesSearch && matchesEstado;
     });
-  }, [misOrdenes, search, estadoFilter]);
+  }, [misOrdenes, search, estadoFilter, hiddenOrders]);
 
   // Separar órdenes por estado para mostrar las más importantes primero
   const ordenesPendientes = filteredOrdenes.filter(o => o.estado === 'pendiente');
@@ -206,11 +222,12 @@ const MisOrdenesTrabajoList: React.FC = () => {
     { value: 'completada', label: 'Completada' }
   ];
 
+
   const OrdenCard = ({ orden }: { orden: OrdenTrabajo }) => {
     const isVencida = new Date(orden.fecha_programada) < new Date() && orden.estado !== 'completada';
     
     return (
-      <div className={`bg-gray-800 rounded-lg p-4 border-l-4 ${
+      <div className={`bg-gray-800 rounded-lg p-4 border-l-4 transition-all duration-500 ${
         orden.nivel_criticidad === 'critica' ? 'border-red-500' :
         orden.nivel_criticidad === 'alta' ? 'border-orange-500' :
         orden.nivel_criticidad === 'media' ? 'border-yellow-500' :
@@ -279,6 +296,19 @@ const MisOrdenesTrabajoList: React.FC = () => {
             >
               <CheckCircle className="w-4 h-4 mr-1" />
               Completar
+            </Button>
+          )}
+
+          {orden.estado === 'completada' && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleHideOrder(orden.id)}
+              className="text-gray-400 hover:text-red-400 border-gray-600 hover:border-red-400"
+              title="Ocultar orden completada"
+            >
+              <EyeOff className="w-4 h-4 mr-1" />
+              Ocultar
             </Button>
           )}
 
@@ -356,6 +386,21 @@ const MisOrdenesTrabajoList: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Botón para mostrar órdenes ocultas */}
+      {hiddenOrders.size > 0 && (
+        <div className="flex justify-center">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleShowHiddenOrders}
+            className="text-gray-400 hover:text-blue-400 border-gray-600 hover:border-blue-400"
+          >
+            <EyeOff className="w-4 h-4 mr-2" />
+            Mostrar {hiddenOrders.size} orden{hiddenOrders.size !== 1 ? 'es' : ''} oculta{hiddenOrders.size !== 1 ? 's' : ''}
+          </Button>
+        </div>
+      )}
 
       {/* Lista de órdenes en formato de cards */}
       <div className="space-y-4">

@@ -24,6 +24,9 @@ import { ChangePassword } from './pages/Auth'
 // Importar páginas de órdenes de trabajo
 import { OrdenesTrabajoList, MisOrdenesTrabajoList, OrdenTrabajoForm, OrdenTrabajoDetail } from './pages/OrdenesTrabajoMantenimiento'
 
+// Importar dashboard de métricas
+import { MetricasDashboard } from './pages/Dashboard'
+
 function App() {
   return (
     <AuthProvider>
@@ -204,6 +207,13 @@ function App() {
           <Route path="/mis-ordenes-trabajo" element={
             <RequirePageAccess pagePath="/mis-ordenes-trabajo">
               <MisOrdenesTrabajoList />
+            </RequirePageAccess>
+          } />
+          
+          {/* Ruta para dashboard de métricas */}
+          <Route path="/dashboard-metricas" element={
+            <RequirePageAccess pagePath="/dashboard-metricas">
+              <MetricasDashboard />
             </RequirePageAccess>
           } />
           

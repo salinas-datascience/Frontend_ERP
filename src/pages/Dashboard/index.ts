@@ -1,0 +1,1 @@
+export { MetricasDashboard } from './MetricasDashboard';
