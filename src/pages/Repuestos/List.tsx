@@ -6,8 +6,10 @@ import { Button } from '../../components/ui/Button';
 import { SearchInput } from '../../components/ui/SearchInput';
 import { FilterSelect } from '../../components/ui/FilterSelect';
 import { Pagination } from '../../components/ui/Pagination';
+import { Badge } from '../../components/ui/Badge';
 import { useRepuestosSearch } from '../../hooks/useRepuestosSearch';
 import { repuestosApi } from '../../api';
+import { TIPO_LABELS, TIPO_COLORS } from '../../types';
 import { Plus, Edit, Trash2, Eye, Filter, X } from 'lucide-react';
 
 const RepuestosList: React.FC = () => {
@@ -30,6 +32,7 @@ const RepuestosList: React.FC = () => {
     endIndex,
     uniqueProveedores,
     uniqueUbicaciones,
+    uniqueTipos,
   } = useRepuestosSearch();
 
   const deleteMutation = useMutation({
@@ -80,10 +83,20 @@ const RepuestosList: React.FC = () => {
     { value: 'empty', label: 'Sin stock (0)' },
   ];
 
+  const tipoOptions = [
+    { value: 'all', label: 'Todos los tipos' },
+    { value: 'none', label: 'Sin tipo' },
+    ...uniqueTipos.map(t => ({ 
+      value: t, 
+      label: TIPO_LABELS[t as keyof typeof TIPO_LABELS] || t 
+    }))
+  ];
+
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-white">Repuestos</h1>
+        <h1 className="text-2xl font-bold text-white">Repuestos - TEST EDIT</h1>
         <Link to="/repuestos/nuevo">
           <Button variant="primary">
             <Plus className="w-4 h-4 mr-2" />
@@ -108,7 +121,22 @@ const RepuestosList: React.FC = () => {
           </div>
 
           <div className="flex flex-col lg:flex-row gap-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 flex-1">
+              <div className="bg-red-500 p-2 rounded text-white">
+                <label className="block text-sm font-medium mb-2">Tipo (DEBUG)</label>
+                <select
+                  value={filters.tipo}
+                  onChange={(e) => updateFilter('tipo', e.target.value)}
+                  className="w-full p-2 bg-gray-800 text-white rounded border border-gray-600"
+                >
+                  <option value="all">Todos los tipos</option>
+                  <option value="none">Sin tipo</option>
+                  <option value="insumo">Insumo</option>
+                  <option value="repuesto">Repuesto</option>
+                  <option value="consumible">Consumible</option>
+                </select>
+              </div>
+              
               <FilterSelect
                 label="Proveedor"
                 value={filters.proveedor}
@@ -166,6 +194,7 @@ const RepuestosList: React.FC = () => {
               <TableRow>
                 <TableHead>Código</TableHead>
                 <TableHead>Nombre</TableHead>
+                <TableHead>Tipo</TableHead>
                 <TableHead>Cantidad</TableHead>
                 <TableHead>Ubicación</TableHead>
                 <TableHead>Proveedor</TableHead>
@@ -175,7 +204,7 @@ const RepuestosList: React.FC = () => {
             <TableBody>
               {repuestos.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-gray-400">
+                  <TableCell colSpan={7} className="text-center py-8 text-gray-400">
                     {hasActiveFilters 
                       ? 'No se encontraron repuestos con los filtros aplicados'
                       : 'No hay repuestos registrados'
@@ -187,6 +216,17 @@ const RepuestosList: React.FC = () => {
                   <TableRow key={repuesto.id}>
                     <TableCell className="font-mono">{repuesto.codigo}</TableCell>
                     <TableCell className="font-medium">{repuesto.nombre}</TableCell>
+                    <TableCell>
+                      {repuesto.tipo ? (
+                        <Badge 
+                          className={TIPO_COLORS[repuesto.tipo as keyof typeof TIPO_COLORS] || 'bg-gray-100 text-gray-800'}
+                        >
+                          {TIPO_LABELS[repuesto.tipo as keyof typeof TIPO_LABELS] || repuesto.tipo}
+                        </Badge>
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 rounded-full text-xs ${
                         repuesto.cantidad_minima 

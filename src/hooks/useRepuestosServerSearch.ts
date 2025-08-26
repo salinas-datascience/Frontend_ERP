@@ -9,6 +9,7 @@ export interface RepuestosFilters {
   proveedor: string;
   ubicacion: string;
   stockStatus: 'all' | 'available' | 'low' | 'empty';
+  tipo: string;
 }
 
 const initialFilters: RepuestosFilters = {
@@ -16,6 +17,7 @@ const initialFilters: RepuestosFilters = {
   proveedor: '',
   ubicacion: '',
   stockStatus: 'all',
+  tipo: '',
 };
 
 export const useRepuestosServerSearch = () => {
@@ -40,6 +42,7 @@ export const useRepuestosServerSearch = () => {
     proveedor_id: filters.proveedor && filters.proveedor !== 'all' ? filters.proveedor : undefined,
     ubicacion: filters.ubicacion && filters.ubicacion !== 'all' ? filters.ubicacion : undefined,
     stock_status: filters.stockStatus !== 'all' ? filters.stockStatus : undefined,
+    tipo: filters.tipo && filters.tipo !== 'all' ? filters.tipo : undefined,
     page,
     limit: itemsPerPage,
   };
@@ -158,6 +161,14 @@ export const useRepuestosServerSearch = () => {
         }
       }
 
+      if (filters.tipo && filters.tipo !== 'all') {
+        if (filters.tipo === 'none') {
+          if (repuesto.tipo) return false;
+        } else {
+          if (!repuesto.tipo || repuesto.tipo !== filters.tipo) return false;
+        }
+      }
+
       return true;
     });
 
@@ -193,6 +204,18 @@ export const useRepuestosServerSearch = () => {
         return Array.from(ubicaciones).sort();
       })()
     : [];
+  const uniqueTipos = allRepuestos && allRepuestos.length > 0
+    ? (() => {
+        const tipos = new Set<string>();
+        allRepuestos.forEach((r: Repuesto) => {
+          if (r.tipo) {
+            tipos.add(r.tipo);
+          }
+        });
+        
+        return Array.from(tipos).sort();
+      })()
+    : [];
 
   return {
     repuestos,
@@ -213,6 +236,7 @@ export const useRepuestosServerSearch = () => {
     // Filter options
     uniqueProveedores,
     uniqueUbicaciones,
+    uniqueTipos,
     // Meta info
     isUsingServerSearch,
   };

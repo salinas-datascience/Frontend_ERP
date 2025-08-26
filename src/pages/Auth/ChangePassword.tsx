@@ -16,7 +16,7 @@ interface ChangePasswordForm {
 
 export default function ChangePassword() {
   const navigate = useNavigate();
-  const { authState, refreshUser } = useAuth();
+  const { authState, refreshUser, updateUser } = useAuth();
   
   const [formData, setFormData] = useState<ChangePasswordForm>({
     password_actual: '',
@@ -47,15 +47,25 @@ export default function ChangePassword() {
       
       // Actualizar la información del usuario para quitar el flag debe_cambiar_password
       try {
+        // Primero actualizar localmente
+        if (authState.user) {
+          updateUser({
+            ...authState.user,
+            debe_cambiar_password: false
+          });
+        }
+        
+        // Luego refrescar desde el servidor
         await refreshUser();
       } catch (error) {
         console.error('Error al actualizar información del usuario:', error);
+        // Si falla el refresh, al menos tenemos la actualización local
       }
       
-      // Redirigir después de 2 segundos
+      // Redirigir después de 3 segundos
       setTimeout(() => {
-        navigate('/');
-      }, 2000);
+        navigate('/', { replace: true });
+      }, 3000);
     },
     onError: (error: any) => {
       setSuccess(false);
@@ -199,11 +209,21 @@ export default function ChangePassword() {
           {/* Mensaje de éxito */}
           {success && (
             <div className="mb-6 p-4 bg-green-900 border border-green-700 rounded-lg">
-              <div className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
-                <p className="text-green-200 text-sm">
-                  Contraseña cambiada exitosamente. Redirigiendo...
-                </p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
+                  <p className="text-green-200 text-sm">
+                    Contraseña cambiada exitosamente. Redirigiendo al inicio en 3 segundos...
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/', { replace: true })}
+                  className="ml-4 bg-green-800 border-green-600 text-green-200 hover:bg-green-700"
+                >
+                  Ir al Inicio
+                </Button>
               </div>
             </div>
           )}

@@ -9,6 +9,7 @@ import { Pagination } from '../../components/ui/Pagination';
 import { useRepuestosServerSearch } from '../../hooks/useRepuestosServerSearch';
 import { useInvalidateRepuestos } from '../../hooks/useInvalidateRepuestos';
 import { repuestosApi } from '../../api';
+import { TIPO_LABELS, TIPO_COLORS } from '../../types';
 import { Plus, Edit, Trash2, Eye, Filter, X, Server, Monitor, Minus } from 'lucide-react';
 
 const RepuestosListOptimized: React.FC = () => {
@@ -31,6 +32,7 @@ const RepuestosListOptimized: React.FC = () => {
     endIndex,
     uniqueProveedores,
     uniqueUbicaciones,
+    uniqueTipos,
     isUsingServerSearch,
   } = useRepuestosServerSearch();
 
@@ -83,6 +85,15 @@ const RepuestosListOptimized: React.FC = () => {
     { value: 'available', label: 'Stock disponible (>10)' },
     { value: 'low', label: 'Stock bajo (1-10)' },
     { value: 'empty', label: 'Sin stock (0)' },
+  ];
+
+  const tipoOptions = [
+    { value: 'all', label: 'Todos los tipos' },
+    { value: 'none', label: 'Sin tipo' },
+    ...uniqueTipos.map(t => ({ 
+      value: t, 
+      label: TIPO_LABELS[t as keyof typeof TIPO_LABELS] || t 
+    }))
   ];
 
   return (
@@ -138,7 +149,14 @@ const RepuestosListOptimized: React.FC = () => {
           </div>
 
           <div className="flex flex-col lg:flex-row gap-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1">
+              <FilterSelect
+                label="Tipo"
+                value={filters.tipo}
+                onChange={(e) => updateFilter('tipo', e.target.value)}
+                options={tipoOptions}
+              />
+              
               <FilterSelect
                 label="Proveedor"
                 value={filters.proveedor}

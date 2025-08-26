@@ -6,6 +6,7 @@ export interface RepuestosSearchParams {
   proveedor_id?: number | string;
   ubicacion?: string;
   stock_status?: 'available' | 'low' | 'empty';
+  tipo?: string;
   page?: number;
   limit?: number;
 }
@@ -89,6 +90,15 @@ export const repuestosApi = {
             return true;
         }
       });
+    }
+
+    // Filtrar por tipo
+    if (params.tipo && params.tipo !== 'all') {
+      if (params.tipo === 'none') {
+        filteredItems = filteredItems.filter((item: any) => !item.tipo);
+      } else {
+        filteredItems = filteredItems.filter((item: any) => item.tipo === params.tipo);
+      }
     }
 
     // Simular paginación

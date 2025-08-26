@@ -8,6 +8,7 @@ export interface RepuestosFilters {
   proveedor: string;
   ubicacion: string;
   stockStatus: 'all' | 'available' | 'low' | 'empty';
+  tipo: string;
 }
 
 const initialFilters: RepuestosFilters = {
@@ -15,6 +16,7 @@ const initialFilters: RepuestosFilters = {
   proveedor: '',
   ubicacion: '',
   stockStatus: 'all',
+  tipo: '',
 };
 
 export const useRepuestosSearch = () => {
@@ -93,6 +95,15 @@ export const useRepuestosSearch = () => {
         }
       }
 
+      // Filtro por tipo
+      if (filters.tipo && filters.tipo !== 'all') {
+        if (filters.tipo === 'none') {
+          if (repuesto.tipo) return false;
+        } else {
+          if (repuesto.tipo !== filters.tipo) return false;
+        }
+      }
+
       return true;
     });
   }, [allRepuestos, filters]);
@@ -147,6 +158,20 @@ export const useRepuestosSearch = () => {
     return Array.from(ubicaciones).sort();
   }, [allRepuestos]);
 
+  const uniqueTipos = useMemo(() => {
+    if (!allRepuestos) return [];
+    
+    const tipos = new Set<string>();
+    
+    allRepuestos.forEach((r: Repuesto) => {
+      if (r.tipo) {
+        tipos.add(r.tipo);
+      }
+    });
+    
+    return Array.from(tipos).sort();
+  }, [allRepuestos]);
+
   return {
     repuestos: paginatedRepuestos,
     filters,
@@ -166,5 +191,6 @@ export const useRepuestosSearch = () => {
     // Opciones para filtros
     uniqueProveedores,
     uniqueUbicaciones,
+    uniqueTipos,
   };
 };

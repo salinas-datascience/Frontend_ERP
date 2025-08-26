@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { repuestosApi, proveedoresApi, almacenamientosApi } from '../../api';
-import type { RepuestoCreate, RepuestoUpdate } from '../../types';
+import type { RepuestoCreate, RepuestoUpdate, TIPOS_REPUESTO, TIPO_LABELS } from '../../types';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { AlmacenamientoCRUD } from '../../components/AlmacenamientoCRUD';
@@ -25,6 +25,8 @@ const RepuestosForm: React.FC = () => {
     cantidad: 0,
     cantidad_minima: undefined,
     proveedor_id: undefined,
+    tipo: undefined,
+    descripcion_aduana: '',
   });
 
   const [showAlmacenamientoModal, setShowAlmacenamientoModal] = useState(false);
@@ -56,6 +58,8 @@ const RepuestosForm: React.FC = () => {
         cantidad: repuesto.cantidad,
         cantidad_minima: repuesto.cantidad_minima,
         proveedor_id: repuesto.proveedor_id,
+        tipo: repuesto.tipo || undefined,
+        descripcion_aduana: repuesto.descripcion_aduana || '',
       });
     }
   }, [repuesto, isEditing]);
@@ -232,6 +236,38 @@ const RepuestosForm: React.FC = () => {
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Tipo
+              </label>
+              <select
+                name="tipo"
+                value={formData.tipo || ''}
+                onChange={handleChange}
+                className="flex h-10 w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Seleccionar tipo</option>
+                <option value="insumo">Insumo</option>
+                <option value="repuesto">Repuesto</option>
+                <option value="consumible">Consumible</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Descripción Aduana
+              </label>
+              <Input
+                name="descripcion_aduana"
+                value={formData.descripcion_aduana}
+                onChange={handleChange}
+                placeholder="Descripción para documentos de aduana"
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                Descripción que se usará por defecto en órdenes de compra
+              </p>
             </div>
 
             <div className="md:col-span-2">

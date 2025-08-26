@@ -4,3 +4,4 @@ export * from './repuesto';
 export * from './historial';
 export * from './almacenamiento';
 export * from './auth';
+export * from './orden-compra';

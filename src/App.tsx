@@ -10,6 +10,7 @@ import RepuestosListOptimized from './pages/Repuestos/ListOptimized'
 import { ProveedoresList, ProveedoresForm, ProveedoresDetail } from './pages/Proveedores'
 import { MaquinasList, MaquinasForm, MaquinasDetail } from './pages/Maquinas'
 import { ModelosMaquinasList, ModelosMaquinasForm, ModelosMaquinasDetail } from './pages/ModelosMaquinas'
+import { OrdenesCompraList, OrdenCompraForm, OrdenCompraDetail, ConfirmarLlegada, DocumentUpload } from './pages/OrdenesCompra'
 import HistorialPage from './pages/Historial'
 
 // Importar páginas de administración
@@ -139,6 +140,38 @@ function App() {
           <Route path="/historial" element={
             <RequirePageAccess pagePath="/historial">
               <HistorialPage />
+            </RequirePageAccess>
+          } />
+
+          {/* Rutas de órdenes de compra */}
+          <Route path="/ordenes-compra" element={
+            <RequirePageAccess pagePath="/ordenes-compra">
+              <OrdenesCompraList />
+            </RequirePageAccess>
+          } />
+          <Route path="/ordenes-compra/nuevo" element={
+            <RequirePageAccess pagePath="/ordenes-compra">
+              <OrdenCompraForm />
+            </RequirePageAccess>
+          } />
+          <Route path="/ordenes-compra/:id" element={
+            <RequirePageAccess pagePath="/ordenes-compra">
+              <OrdenCompraDetail />
+            </RequirePageAccess>
+          } />
+          <Route path="/ordenes-compra/:id/editar" element={
+            <RequirePageAccess pagePath="/ordenes-compra">
+              <OrdenCompraForm />
+            </RequirePageAccess>
+          } />
+          <Route path="/ordenes-compra/:id/documents" element={
+            <RequirePageAccess pagePath="/ordenes-compra">
+              <DocumentUpload />
+            </RequirePageAccess>
+          } />
+          <Route path="/ordenes-compra/:id/confirmar-llegada" element={
+            <RequirePageAccess pagePath="/ordenes-compra">
+              <ConfirmarLlegada />
             </RequirePageAccess>
           } />
           
