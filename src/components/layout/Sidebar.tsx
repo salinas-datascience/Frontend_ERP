@@ -14,6 +14,10 @@ import {
   Key,
   Cpu,
   Home,
+  Wrench,
+  ClipboardList,
+  Warehouse,
+  ShoppingCart,
   type LucideIcon
 } from 'lucide-react';
 
@@ -28,6 +32,10 @@ const iconMap: Record<string, LucideIcon> = {
   'Shield': Shield,
   'Key': Key,
   'Home': Home,
+  'Wrench': Wrench,
+  'ClipboardList': ClipboardList,
+  'Warehouse': Warehouse,
+  'ShoppingCart': ShoppingCart,
   'Minus': Minus,
 };
 

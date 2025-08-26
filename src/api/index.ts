@@ -6,3 +6,4 @@ export * from './maquinas';
 export * from './historial';
 export * from './almacenamientos';
 export * from './ordenes-compra';
+export * from './ordenes-trabajo';

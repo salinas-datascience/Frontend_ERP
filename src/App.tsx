@@ -21,6 +21,9 @@ import { PermisosList, PermisosForm } from './pages/Admin/Permisos'
 // Importar páginas de autenticación
 import { ChangePassword } from './pages/Auth'
 
+// Importar páginas de órdenes de trabajo
+import { OrdenesTrabajoList, MisOrdenesTrabajoList, OrdenTrabajoForm, OrdenTrabajoDetail } from './pages/OrdenesTrabajoMantenimiento'
+
 function App() {
   return (
     <AuthProvider>
@@ -172,6 +175,35 @@ function App() {
           <Route path="/ordenes-compra/:id/confirmar-llegada" element={
             <RequirePageAccess pagePath="/ordenes-compra">
               <ConfirmarLlegada />
+            </RequirePageAccess>
+          } />
+          
+          {/* Rutas de órdenes de trabajo de mantenimiento */}
+          <Route path="/ordenes-trabajo" element={
+            <RequirePageAccess pagePath="/ordenes-trabajo">
+              <OrdenesTrabajoList />
+            </RequirePageAccess>
+          } />
+          <Route path="/ordenes-trabajo/nuevo" element={
+            <RequirePageAccess pagePath="/ordenes-trabajo">
+              <OrdenTrabajoForm />
+            </RequirePageAccess>
+          } />
+          <Route path="/ordenes-trabajo/:id" element={
+            <RequirePageAccess pagePath="/ordenes-trabajo">
+              <OrdenTrabajoDetail />
+            </RequirePageAccess>
+          } />
+          <Route path="/ordenes-trabajo/:id/editar" element={
+            <RequirePageAccess pagePath="/ordenes-trabajo">
+              <OrdenTrabajoForm />
+            </RequirePageAccess>
+          } />
+          
+          {/* Ruta para OTs asignadas */}
+          <Route path="/mis-ordenes-trabajo" element={
+            <RequirePageAccess pagePath="/mis-ordenes-trabajo">
+              <MisOrdenesTrabajoList />
             </RequirePageAccess>
           } />
           

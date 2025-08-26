@@ -5,3 +5,4 @@ export * from './historial';
 export * from './almacenamiento';
 export * from './auth';
 export * from './orden-compra';
+export * from './orden-trabajo';

@@ -193,3 +193,39 @@ export const adminPaginasService = {
     return response.data;
   }
 };
+
+// Export unificado para compatibilidad
+export const adminApi = {
+  // Alias para usuarios
+  getUsuarios: adminUsersService.getUsuarios,
+  getUsuario: adminUsersService.getUsuario,
+  createUsuario: adminUsersService.createUsuario,
+  updateUsuario: adminUsersService.updateUsuario,
+  deleteUsuario: adminUsersService.deleteUsuario,
+  activateUsuario: adminUsersService.activateUsuario,
+  unlockUsuario: adminUsersService.unlockUsuario,
+  asignarPaginas: adminUsersService.asignarPaginas,
+  getPaginasUsuario: adminUsersService.getPaginasUsuario,
+  resetPassword: adminUsersService.resetPassword,
+  
+  // Alias para roles
+  getRoles: adminRolesService.getRoles,
+  getRol: adminRolesService.getRol,
+  createRol: adminRolesService.createRol,
+  updateRol: adminRolesService.updateRol,
+  deleteRol: adminRolesService.deleteRol,
+  
+  // Alias para permisos
+  getPermisos: adminPermisosService.getPermisos,
+  getPermiso: adminPermisosService.getPermiso,
+  createPermiso: adminPermisosService.createPermiso,
+  updatePermiso: adminPermisosService.updatePermiso,
+  deletePermiso: adminPermisosService.deletePermiso,
+  
+  // Alias para páginas
+  getPaginas: adminPaginasService.getPaginas,
+  getPagina: adminPaginasService.getPagina,
+  createPagina: adminPaginasService.createPagina,
+  updatePagina: adminPaginasService.updatePagina,
+  deletePagina: adminPaginasService.deletePagina
+};
