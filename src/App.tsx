@@ -27,6 +27,9 @@ import { OrdenesTrabajoList, MisOrdenesTrabajoList, OrdenTrabajoForm, OrdenTraba
 // Importar dashboard de métricas
 import { MetricasDashboard } from './pages/Dashboard'
 
+// Importar plan de mantenimiento
+import { PlanMantenimiento } from './pages/PlanMantenimiento'
+
 function App() {
   return (
     <AuthProvider>
@@ -214,6 +217,13 @@ function App() {
           <Route path="/dashboard-metricas" element={
             <RequirePageAccess pagePath="/dashboard-metricas">
               <MetricasDashboard />
+            </RequirePageAccess>
+          } />
+          
+          {/* Ruta para plan de mantenimiento */}
+          <Route path="/plan-mantenimiento" element={
+            <RequirePageAccess pagePath="/plan-mantenimiento">
+              <PlanMantenimiento />
             </RequirePageAccess>
           } />
           

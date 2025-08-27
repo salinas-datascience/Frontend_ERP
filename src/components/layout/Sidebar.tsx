@@ -19,6 +19,7 @@ import {
   Warehouse,
   ShoppingCart,
   BarChart3,
+  Calendar,
   type LucideIcon
 } from 'lucide-react';
 
@@ -38,6 +39,7 @@ const iconMap: Record<string, LucideIcon> = {
   'Warehouse': Warehouse,
   'ShoppingCart': ShoppingCart,
   'BarChart3': BarChart3,
+  'Calendar': Calendar,
   'Minus': Minus,
 };
 
