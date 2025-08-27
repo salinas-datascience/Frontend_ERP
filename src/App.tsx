@@ -30,6 +30,9 @@ import { MetricasDashboard } from './pages/Dashboard'
 // Importar plan de mantenimiento
 import { PlanMantenimiento } from './pages/PlanMantenimiento'
 
+// Importar analytics de IA
+import { AnalyticsDashboard } from './pages/Analytics'
+
 function App() {
   return (
     <AuthProvider>
@@ -224,6 +227,13 @@ function App() {
           <Route path="/plan-mantenimiento" element={
             <RequirePageAccess pagePath="/plan-mantenimiento">
               <PlanMantenimiento />
+            </RequirePageAccess>
+          } />
+          
+          {/* Ruta para analytics de IA */}
+          <Route path="/analytics-ia" element={
+            <RequirePageAccess pagePath="/analytics-ia">
+              <AnalyticsDashboard />
             </RequirePageAccess>
           } />
           
