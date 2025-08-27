@@ -12,8 +12,10 @@ import {
   Download,
   Upload,
   Check,
-  AlertCircle
+  AlertCircle,
+  FileSpreadsheet
 } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import { ordenesCompraApi } from '../../api/ordenes-compra';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
@@ -138,6 +140,62 @@ const OrdenCompraDetail: React.FC = () => {
   const canQuote = orden.estado === EstadosOrden.BORRADOR;
   const canConfirm = orden.estado === EstadosOrden.COTIZADO;
   const canConfirmArrival = orden.estado === EstadosOrden.CONFIRMADO;
+
+  const handleExportToExcel = () => {
+    // Preparar los datos para exportar
+    const exportData = orden.items.map((item, index) => {
+      const isManual = item.es_item_manual;
+      const precio = parseFloat(item.precio_unitario || '0');
+      const total = precio * item.cantidad_pedida;
+      
+      return {
+        'N°': index + 1,
+        'ID': item.id,
+        'Orden ID': item.orden_id,
+        'Repuesto ID': item.repuesto_id || '',
+        'Nombre': isManual ? item.nombre_manual : item.repuesto?.nombre || '',
+        'Código': isManual ? item.codigo_manual : item.repuesto?.codigo || '',
+        'Detalle': isManual ? item.detalle_manual : item.repuesto?.detalle || '',
+        'Cantidad Pedida': item.cantidad_pedida,
+        'Cantidad Recibida': item.cantidad_recibida,
+        'Descripción Aduana': item.descripcion_aduana || '',
+        'Precio Unitario': item.precio_unitario || '',
+        'Total': precio > 0 ? total.toFixed(2) : '',
+        'Es Item Manual': isManual ? 'Sí' : 'No',
+        'Cantidad Mínima Manual': item.cantidad_minima_manual || '',
+        'Fecha Creación': new Date(item.fecha_creacion).toLocaleDateString('es-ES')
+      };
+    });
+
+    // Crear el libro de trabajo
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Items');
+
+    // Configurar el ancho de las columnas
+    const colWidths = [
+      { wch: 5 },   // N°
+      { wch: 8 },   // ID
+      { wch: 10 },  // Orden ID
+      { wch: 12 },  // Repuesto ID
+      { wch: 30 },  // Nombre
+      { wch: 15 },  // Código
+      { wch: 40 },  // Detalle
+      { wch: 12 },  // Cantidad Pedida
+      { wch: 12 },  // Cantidad Recibida
+      { wch: 25 },  // Descripción Aduana
+      { wch: 15 },  // Precio Unitario
+      { wch: 15 },  // Total
+      { wch: 15 },  // Es Item Manual
+      { wch: 18 },  // Cantidad Mínima Manual
+      { wch: 15 }   // Fecha Creación
+    ];
+    ws['!cols'] = colWidths;
+
+    // Generar y descargar el archivo
+    const fileName = `Orden_Compra_${orden.id}_Items_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+  };
 
   const handleQuote = () => {
     setShowRequisicionModal(true);
@@ -332,9 +390,20 @@ const OrdenCompraDetail: React.FC = () => {
           {/* Items de la Orden */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-gray-900 dark:text-white">
-                Items ({totalItems})
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-gray-900 dark:text-white">
+                  Items ({totalItems})
+                </CardTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportToExcel}
+                  className="text-green-600 dark:text-green-400 border-green-600 dark:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20"
+                >
+                  <FileSpreadsheet className="w-4 h-4 mr-2" />
+                  Exportar
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">

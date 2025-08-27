@@ -768,17 +768,45 @@ const OrdenCompraForm: React.FC = () => {
     setCurrentStep(prev => prev - 1);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validateStep(currentStep)) return;
 
     if (isEditing) {
-      updateMutation.mutate({
-        id: Number(id),
-        data: {
-          proveedor_id: formData.proveedor_id,
-          observaciones: formData.observaciones,
+      try {
+        // Actualizar información básica de la orden
+        await updateMutation.mutateAsync({
+          id: Number(id),
+          data: {
+            proveedor_id: formData.proveedor_id,
+            observaciones: formData.observaciones,
+          }
+        });
+        
+        // Actualizar items existentes individualmente
+        if (orden?.items) {
+          const updatePromises = formData.items.map((item, index) => {
+            const originalItem = orden.items[index];
+            if (originalItem) {
+              // Actualizar item existente
+              return ordenesCompraApi.updateItem(originalItem.id, {
+                cantidad_pedida: item.cantidad_pedida,
+                descripcion_aduana: item.descripcion_aduana,
+                precio_unitario: item.precio_unitario,
+              });
+            }
+            return Promise.resolve();
+          });
+          
+          await Promise.all(updatePromises.filter(Boolean));
         }
-      });
+        
+        // Invalidar queries para refrescar datos
+        queryClient.invalidateQueries({ queryKey: ['ordenes-compra'] });
+        queryClient.invalidateQueries({ queryKey: ['orden-compra', id] });
+        navigate('/ordenes-compra');
+      } catch (error) {
+        console.error('Error al actualizar orden:', error);
+      }
     } else {
       // Convertir todos los items para envío (incluidos manuales)
       const itemsParaEnvio = formData.items.map(item => ({

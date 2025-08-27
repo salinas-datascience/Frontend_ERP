@@ -19,7 +19,7 @@ const Navbar: React.FC = () => {
     <header className="bg-gray-800 border-b border-gray-700 h-16 flex items-center px-6">
       <div className="flex items-center flex-1">
         <h1 className="text-xl font-semibold text-blue-400">
-          Sistema ERP Mantia
+          Sistema ERP de Mantenimiento
         </h1>
       </div>
 
